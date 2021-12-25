@@ -1,6 +1,6 @@
 {
   "name": "ethereum-audit",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An Insurance and Reputation System for Auditors and Developers",
   "main": "src/backend/server.js",
   "repository": "https://github.com/Lichen-Dev/Ethereum-Audit.git",
@@ -9,12 +9,31 @@
     "Aimee MacDonald <aimeelmacdonald@gmail.com>"
   ],
   "scripts": {
-    "start_server": "node src/backend/server.js"
+    "start_server": "node src/backend/server.js",
+    "compile_frontend": "webpack --config webpack.config.js"
   },
   "license": "MIT",
   "dependencies": {
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
     "pug": "^3.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.5",
+    "@babel/preset-env": "^7.16.5",
+    "@babel/preset-react": "^7.16.5",
+    "autoprefixer": "^10.4.0",
+    "babel-loader": "^8.2.3",
+    "css-loader": "^6.5.1",
+    "cssnano": "^5.0.14",
+    "mini-css-extract-plugin": "^2.4.5",
+    "normalize.css": "^8.0.1",
+    "postcss-loader": "^6.2.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "sass": "^1.45.1",
+    "sass-loader": "^12.4.0",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
   }
 }

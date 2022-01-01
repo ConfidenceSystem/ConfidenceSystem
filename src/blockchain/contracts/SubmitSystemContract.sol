@@ -55,7 +55,7 @@ mapping (string => SubmittedSystem) public SubmittedSystems;
 
     function FundSystem(string memory IPFS, address payable EscrowAddress, address MockTokenAddress )public{
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-        int StakingPayment=SubmittedSystem_.Bounty*SubmittedSystem_.Bounty;
+        int StakingPayment=SubmittedSystem_.Bounty*SubmittedSystem_.TotalRep;
         MockToken_(MockTokenAddress).Transfer(msg.sender, EscrowAddress, StakingPayment);
     }
 
@@ -138,6 +138,11 @@ mapping (string => SubmittedSystem) public SubmittedSystems;
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
         return SubmittedSystem_.SubmitterAddress;
 
+    }
+
+    function GetBounty(string memory IPFS) external view returns(int){
+        SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
+        return SubmittedSystem_.Bounty;
     }
 
 

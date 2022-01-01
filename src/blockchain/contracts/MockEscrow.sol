@@ -28,14 +28,34 @@ interface MockToken_ {
 
 contract MockEscrow {
 
-    function PayOut(string memory IPFS, address SubmitSystemContract, address AuditorContract, address AuditorAddress, address MockTokenAddress) public{
-        require(int(block.timestamp)>(SubmitSystemContract_(SubmitSystemContract).GetTimeWindow(IPFS)) && (SubmitSystemContract_(SubmitSystemContract).GetTimeWindowStarted(IPFS)) == true);
-        int payout = (SubmitSystemContract_(SubmitSystemContract).GetBounty(IPFS))*(MockStaker_(AuditorContract).GetStakedRep(IPFS, AuditorAddress));
-        int RepStaked = MockStaker_(AuditorContract).GetStakedRep(IPFS, AuditorAddress);
-        RepStaked = RepStaked -(2*(RepStaked));
-        MockStaker_(AuditorContract).MintRep(IPFS, AuditorAddress);
-        MockStaker_(AuditorContract).UpdateStakedRep(IPFS, AuditorAddress, RepStaked);
-        MockToken_(MockTokenAddress).Transfer(address(this), AuditorAddress, payout);
+
+int payout;
+int RepStaked;
+bool TimePassed;
+
+    fallback() external payable {
+       
+    }
+
+    function CheckTime(string memory IPFS, address SubmitSystemContract) public{
+        uint TimeEnd = uint(SubmitSystemContract_(SubmitSystemContract).GetTimeWindow(IPFS));
+        uint currenttime = block.timestamp;
+        require (TimeEnd > currenttime, "you fucked it");
+        TimePassed = true;
+    }
+
+    function PayOut(string memory IPFS, address SubmitSystemContract, address AuditorContract, address AuditorAddress, address MockTokenAddress) public  {
+       
+         uint TimeEnd = uint(SubmitSystemContract_(SubmitSystemContract).GetTimeWindow(IPFS));
+         uint currenttime = block.timestamp;
+         require (currenttime>TimeEnd, "you fucked it"); //&& (SubmitSystemContract_(SubmitSystemContract).GetTimeWindowStarted(IPFS)) == true);
+        payout = ((SubmitSystemContract_(SubmitSystemContract).GetBounty(IPFS))*(MockStaker_(AuditorContract).GetStakedRep(IPFS, AuditorAddress)));
+        RepStaked = MockStaker_(AuditorContract).GetStakedRep(IPFS, AuditorAddress);
+        RepStaked = (RepStaked -(2*(RepStaked)));
+
+         MockStaker_(AuditorContract).MintRep(IPFS, AuditorAddress);
+          MockStaker_(AuditorContract).UpdateStakedRep(IPFS, AuditorAddress, RepStaked);
+          MockToken_(MockTokenAddress).Transfer(address(this), AuditorAddress, payout);
     }
 
     function ReturnUnstaked(string memory IPFS, address SubmitSystemContract, address MockTokenAddress) public{

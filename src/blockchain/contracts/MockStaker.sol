@@ -44,9 +44,14 @@ function UpdateStakedRep(string memory IPFS, address AuditorAddress, int RepStak
 function MintRep(string memory IPFS, address AuditorAddress) external{
     Auditor storage Auditor_ = Auditors[AuditorAddress];
     int RepGain = Auditor_.StakedRep[IPFS];
-    RepGain = RepGain + (((RepGain)/10)*2);
+    RepGain =  (((RepGain)/10)*2);
     Auditor_.AuditorRep= Auditor_.AuditorRep + RepGain;
 
+}
+
+function GetTotalRep(address AuditorAddress) public view returns(int){
+    Auditor storage Auditor_ = Auditors[AuditorAddress];
+    return Auditor_.AuditorRep;
 }
 
 

@@ -16,6 +16,10 @@ contract MockToken {
         return balance[Account];
     }
 
+    function GetBalancePublic(address Account) public view returns(int){
+        return balance[Account];
+    }
+
     function Transfer(address sender, address receiver, int amount) external{
 
         require(balance[sender] >= amount);

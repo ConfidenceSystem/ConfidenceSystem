@@ -48,7 +48,7 @@ bool TimePassed;
        
          uint TimeEnd = uint(SubmitSystemContract_(SubmitSystemContract).GetTimeWindow(IPFS));
          uint currenttime = block.timestamp;
-         require (currenttime>TimeEnd, "you fucked it"); //&& (SubmitSystemContract_(SubmitSystemContract).GetTimeWindowStarted(IPFS)) == true);
+         require (currenttime>TimeEnd); //&& (SubmitSystemContract_(SubmitSystemContract).GetTimeWindowStarted(IPFS)) == true);
         payout = ((SubmitSystemContract_(SubmitSystemContract).GetBounty(IPFS))*(MockStaker_(AuditorContract).GetStakedRep(IPFS, AuditorAddress)));
         RepStaked = MockStaker_(AuditorContract).GetStakedRep(IPFS, AuditorAddress);
         RepStaked = (RepStaked -(2*(RepStaked)));

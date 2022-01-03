@@ -4,7 +4,7 @@
   "description": "An Insurance and Reputation System for Auditors and Developers",
   "main": "src/backend/server.js",
   "repository": "https://github.com/Lichen-Dev/Ethereum-Audit.git",
-  "author": "Jack Lubbock <lubbockjc@gmail.com>",
+  "author": "",
   "contributors": [
     "Aimee MacDonald <aimeelmacdonald@gmail.com>"
   ],

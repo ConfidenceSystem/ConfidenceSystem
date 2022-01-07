@@ -47,7 +47,7 @@ function BurnRep(string memory IPFS, address AuditorAddress, address SubmitSyste
     int originalRep=Auditor_.StakedRep[IPFS];
     RepStaked=(RepStaked*(100-int(hackseverity)))/100;
     Auditor_.StakedRep[IPFS]=RepStaked;
-    int replost=originalRep=RepStaked;
+    int replost=originalRep-RepStaked;
     Auditor_.AuditorRep = Auditor_.AuditorRep-replost;
 
 }

@@ -5,12 +5,40 @@ import "hardhat/console.sol";
 
 
 interface SubmitSystemContract_{
-function GetComplexity(string memory IPFS, address RealityMockAddress) external  returns(bytes32);
+function GetComplexity(string memory IPFS) external  returns(bytes32);
 function GetSeveritiesAggregate(string memory IPFS) external view returns(uint);
 
 }
 
 contract MockStaker {
+
+    
+address DeployerAddress;
+
+constructor(address deployeraddress){
+
+DeployerAddress=deployeraddress;
+
+}
+
+address StakerAdress;
+address EscrowAddress;
+address TokenAddress;
+address RealityAddress;
+address KlerosProxyAddress;
+address SubmitterAddress;
+
+    function SetAddress(address EscrowAddress_, address SubmitterAddress_, address TokenAddress_, address RealityAddress_, address KlerosProxyAddress_) public{
+
+require(msg.sender==DeployerAddress);
+StakerAdress=address(this);
+EscrowAddress=EscrowAddress_;
+TokenAddress=TokenAddress_;
+RealityAddress=RealityAddress_;
+KlerosProxyAddress=KlerosProxyAddress_;
+SubmitterAddress=SubmitterAddress_;
+
+}
 
 struct Auditor{
 
@@ -40,8 +68,8 @@ function GetStakedRep(string memory IPFS, address AuditorAddress) external view 
 
 }
 
-function BurnRep(string memory IPFS, address AuditorAddress, address SubmitSystemContract) external{
-    uint hackseverity = SubmitSystemContract_(SubmitSystemContract).GetSeveritiesAggregate(IPFS);
+function BurnRep(string memory IPFS, address AuditorAddress) external{
+    uint hackseverity = SubmitSystemContract_(SubmitterAddress).GetSeveritiesAggregate(IPFS);
     Auditor storage Auditor_ = Auditors[AuditorAddress];
     int RepStaked = Auditor_.StakedRep[IPFS];
     int originalRep=Auditor_.StakedRep[IPFS];
@@ -60,12 +88,20 @@ function UpdateStakedRep(string memory IPFS, address AuditorAddress, int RepStak
 
 }
 
-function MintRep(string memory IPFS, address AuditorAddress, address SubmitSystemContract, address RealityMock) external{
+function ResetStakedRep(string memory IPFS, address AuditorAddress) external{
+    Auditor storage Auditor_ = Auditors[AuditorAddress];
+    Auditor_.TotalStaked=Auditor_.TotalStaked-Auditor_.StakedRep[IPFS];
+    Auditor_.StakedRep[IPFS] = 0;
 
-    uint hackseverity = SubmitSystemContract_(SubmitSystemContract).GetSeveritiesAggregate(IPFS);
+
+}
+
+function MintRep(string memory IPFS, address AuditorAddress) external{
+
+    uint hackseverity = SubmitSystemContract_(SubmitterAddress).GetSeveritiesAggregate(IPFS);
     Auditor storage Auditor_ = Auditors[AuditorAddress];
     uint RepGain;
-    RepGain = uint(SubmitSystemContract_(SubmitSystemContract).GetComplexity(IPFS,RealityMock));
+    RepGain = uint(SubmitSystemContract_(SubmitterAddress).GetComplexity(IPFS));
     int repgain= int(RepGain*100);
     if (hackseverity>10){
         repgain=0;

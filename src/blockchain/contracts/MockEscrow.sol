@@ -17,9 +17,11 @@ function GetSubmitter(string memory IPFS) external view returns(address);
 interface MockStaker_ {
 function GetStakedRep(string memory IPFS, address AuditorAddress) external view returns(int);
 function UpdateStakedRep(string memory IPFS, address AuditorAddress, int RepStaked) external;
-function MintRep(string memory IPFS, address AuditorAddress, address SubmitSystemContract, address RealityMockAddress) external;
+function MintRep(string memory IPFS, address AuditorAddress) external;
 function MintHackerRep(address AuditorAddress, int RepAmount) external;
-function BurnRep(string memory IPFS, address AuditorAddress, address SubmitSystemContract) external;
+function BurnRep(string memory IPFS, address AuditorAddress) external;
+function ResetStakedRep(string memory IPFS, address AuditorAddress) external;
+
 }
 
 interface MockToken_ {
@@ -31,6 +33,7 @@ interface MockToken_ {
 contract MockEscrow {
 
 
+address DeployerAddress;
 int payout;
 int RepStaked;
 bool TimePassed;
@@ -38,55 +41,76 @@ bool TimePassed;
  uint[5] fundsfactor;
  uint[5] RepFactor;
 
-    constructor() {
+    constructor(address deployeraddress) {
         fundsfactor[1]=10;
         fundsfactor[2]=50;
         fundsfactor[3]=100;
         RepFactor[1] = 100;
         RepFactor[2] = 500;
         RepFactor[3] = 1000;
+        DeployerAddress=deployeraddress;
+
     }
 
-    function PayHacker(string memory IPFS, address SubmitSystemContract, uint hackstatusnumeric, address HackerAddress, address MockTokenAddress, address MockStakerAddress ) external{
+address StakerAdress;
+address EscrowAddress;
+address TokenAddress;
+address RealityAddress;
+address KlerosProxyAddress;
+address SubmitterAddress;
 
-    int hackerpayout = ((SubmitSystemContract_(SubmitSystemContract).GetBounty(IPFS))*(SubmitSystemContract_(SubmitSystemContract).GetStakedRep(IPFS)));
+    function SetAddress(address StakerAdress_, address SubmitterAddress_, address TokenAddress_, address RealityAddress_, address KlerosProxyAddress_) public{
+
+require(msg.sender==DeployerAddress);
+StakerAdress=StakerAdress_;
+EscrowAddress=address(this);
+TokenAddress=TokenAddress_;
+RealityAddress=RealityAddress_;
+KlerosProxyAddress=KlerosProxyAddress_;
+SubmitterAddress=SubmitterAddress_;
+
+}
+
+    function PayHacker(string memory IPFS,  uint hackstatusnumeric, address HackerAddress) external{
+
+    int hackerpayout = ((SubmitSystemContract_(SubmitterAddress).GetBounty(IPFS))*(SubmitSystemContract_(SubmitterAddress).GetStakedRep(IPFS)));
     hackerpayout=(int(fundsfactor[hackstatusnumeric])*hackerpayout);
     hackerpayout = hackerpayout/100;
 
-    MockToken_(MockTokenAddress).Transfer(address(this), HackerAddress, hackerpayout);
-    MockStaker_(MockStakerAddress).MintHackerRep(HackerAddress, int(RepFactor[hackstatusnumeric]));
+    MockToken_(TokenAddress).Transfer(address(this), HackerAddress, hackerpayout);
+    MockStaker_(StakerAdress).MintHackerRep(HackerAddress, int(RepFactor[hackstatusnumeric]));
 
     }
 
 
 
-    function CheckTime(string memory IPFS, address SubmitSystemContract) public{
-        uint TimeEnd = uint(SubmitSystemContract_(SubmitSystemContract).GetTimeWindow(IPFS));
+    function CheckTime(string memory IPFS) public{
+        uint TimeEnd = uint(SubmitSystemContract_(SubmitterAddress).GetTimeWindow(IPFS));
         uint currenttime = block.timestamp;
         require (TimeEnd > currenttime);
         TimePassed = true;
     }
 
-    function PayOut(string memory IPFS, address SubmitSystemContract, address AuditorContract, address AuditorAddress, address MockTokenAddress, address RealityMockAddress) public  {
+    function PayOut(string memory IPFS, address AuditorAddress) public  {
        
-         uint TimeEnd = uint(SubmitSystemContract_(SubmitSystemContract).GetTimeWindow(IPFS));
+         uint TimeEnd = uint(SubmitSystemContract_(SubmitterAddress).GetTimeWindow(IPFS));
          uint currenttime = block.timestamp;
-         require (currenttime>TimeEnd, "you fucked it");//&& (SubmitSystemContract_(SubmitSystemContract).GetTimeWindowStarted(IPFS)) == true);
-         MockStaker_(AuditorContract).BurnRep(IPFS,AuditorAddress,SubmitSystemContract);
-        payout = ((SubmitSystemContract_(SubmitSystemContract).GetBounty(IPFS))*(MockStaker_(AuditorContract).GetStakedRep(IPFS, AuditorAddress)));
-        RepStaked = MockStaker_(AuditorContract).GetStakedRep(IPFS, AuditorAddress);
+         require (currenttime>TimeEnd, "you fucked it");//&& (SubmitSystemContract_(SubmitterAddress).GetTimeWindowStarted(IPFS)) == true);
+         MockStaker_(StakerAdress).BurnRep(IPFS,AuditorAddress);
+        payout = ((SubmitSystemContract_(SubmitterAddress).GetBounty(IPFS))*(MockStaker_(StakerAdress).GetStakedRep(IPFS, AuditorAddress)));
+        RepStaked = MockStaker_(StakerAdress).GetStakedRep(IPFS, AuditorAddress);
         RepStaked = (RepStaked -(2*(RepStaked)));
 
-         MockStaker_(AuditorContract).MintRep(IPFS, AuditorAddress, SubmitSystemContract, RealityMockAddress);
-        MockStaker_(AuditorContract).UpdateStakedRep(IPFS, AuditorAddress, RepStaked);
-          MockToken_(MockTokenAddress).Transfer(address(this), AuditorAddress, payout);
+        MockStaker_(StakerAdress).MintRep(IPFS, AuditorAddress);
+        MockStaker_(StakerAdress).ResetStakedRep(IPFS, AuditorAddress);
+        MockToken_(TokenAddress).Transfer(address(this), AuditorAddress, payout);
     }
 
-    function ReturnUnstaked(string memory IPFS, address SubmitSystemContract, address MockTokenAddress) public{
-            require (SubmitSystemContract_(SubmitSystemContract).GetTimeWindowStarted(IPFS) == true);
-            int ReturnedFunds = (SubmitSystemContract_(SubmitSystemContract).GetTotalRep(IPFS)) - (SubmitSystemContract_(SubmitSystemContract).GetStakedRep(IPFS));
-            ReturnedFunds = ReturnedFunds * (SubmitSystemContract_(SubmitSystemContract).GetBounty(IPFS));
-            MockToken_(MockTokenAddress).Transfer(address(this), (SubmitSystemContract_(SubmitSystemContract).GetSubmitter(IPFS)), ReturnedFunds);
+    function ReturnUnstaked(string memory IPFS) public{
+            require (SubmitSystemContract_(SubmitterAddress).GetTimeWindowStarted(IPFS) == true);
+            int ReturnedFunds = (SubmitSystemContract_(SubmitterAddress).GetTotalRep(IPFS)) - (SubmitSystemContract_(SubmitterAddress).GetStakedRep(IPFS));
+            ReturnedFunds = ReturnedFunds * (SubmitSystemContract_(SubmitterAddress).GetBounty(IPFS));
+            MockToken_(TokenAddress).Transfer(address(this), (SubmitSystemContract_(SubmitterAddress).GetSubmitter(IPFS)), ReturnedFunds);
 
     }
 }

@@ -6,6 +6,34 @@ import "hardhat/console.sol";
 contract MockToken {
 
 
+address DeployerAddress;
+
+constructor(address deployeraddress){
+
+DeployerAddress=deployeraddress;
+
+}
+
+address StakerAdress;
+address EscrowAddress;
+address TokenAddress;
+address RealityAddress;
+address KlerosProxyAddress;
+address SubmitterAddress;
+
+    function SetAddress(address EscrowAddress_, address SubmitterAddress_, address StakerAdress_, address RealityAddress_, address KlerosProxyAddress_) public{
+
+require(msg.sender==DeployerAddress);
+StakerAdress=StakerAdress_;
+EscrowAddress=EscrowAddress_;
+TokenAddress=address(this);
+RealityAddress=RealityAddress_;
+KlerosProxyAddress=KlerosProxyAddress_;
+SubmitterAddress=SubmitterAddress_;
+
+}
+
+
     mapping(address => int) public balance;
 
     function SetBalance(address Account, int Balance) public{

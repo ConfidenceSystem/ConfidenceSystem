@@ -10,8 +10,8 @@ interface MockStaker_ {
 }
 
 interface MockEscrow_ {
-    function PayOut(string memory IPFS, address SubmitSystemContract, address AuditorContract, address payable AuditorAddress) external;
-    function PayHacker(string memory IPFS, address SubmitSystemContract, uint hackstatusnumeric, address HackerAddress, address MockTokenAddress, address MockStakeraddress) external;
+    function PayOut(string memory IPFS,address payable AuditorAddress) external;
+    function PayHacker(string memory IPFS, uint hackstatusnumeric, address HackerAddress) external;
 
 }
 
@@ -36,6 +36,33 @@ interface RealityMock_{
 }
 
 contract SubmitSystemContract {
+
+address DeployerAddress;
+
+constructor(address deployeraddress){
+
+DeployerAddress=deployeraddress;
+
+}
+address StakerAdress;
+address EscrowAddress;
+address TokenAddress;
+address RealityAddress;
+address KlerosProxyAddress;
+address SubmitterAddress;
+
+
+function SetAddress(address StakerAdress_, address EscrowAddress_, address TokenAddress_, address RealityAddress_, address KlerosProxyAddress_) public{
+
+require(msg.sender==DeployerAddress);
+StakerAdress=StakerAdress_;
+EscrowAddress=EscrowAddress_;
+TokenAddress=TokenAddress_;
+RealityAddress=RealityAddress_;
+KlerosProxyAddress=KlerosProxyAddress_;
+SubmitterAddress=address(this);
+
+}
 
 struct SubmittedSystem{
 
@@ -81,7 +108,7 @@ uint QuestionsCounter;
 mapping(string => QuestionHolder) public Questions;
 
 
-function RequestComplexity(string memory IPFS, address KlerosProxy, address RealityMockAddress) internal returns (string memory) {
+function RequestComplexity(string memory IPFS) internal returns (string memory) {
 
     string memory string1= "what is the complexity of this system?\u241f";
     string memory string3='\u241f"1","2","3"\u241feth-technical\u241fen';
@@ -98,7 +125,7 @@ function RequestComplexity(string memory IPFS, address KlerosProxy, address Real
     uint32 opening_ts=0;
     uint nonce=0;
 
-   Questions[IPFS].ComplexityID = RealityMock_(RealityMockAddress).askQuestion(2, AskingQ, KlerosProxy, timeout, opening_ts, nonce);
+   Questions[IPFS].ComplexityID = RealityMock_(RealityAddress).askQuestion(2, AskingQ, KlerosProxyAddress, timeout, opening_ts, nonce);
    return AskingQ;
 }
 
@@ -112,7 +139,7 @@ function ConcatHackString(string memory IPFS, address HackSubmitter) internal vi
 
 }
 
-function RequestHackVerification(address HackSubmitter, string memory IPFS, address KlerosProxy, address RealityMockAddress) internal returns (string memory) {
+function RequestHackVerification(address HackSubmitter, string memory IPFS) internal returns (string memory) {
 
 
     uint i;
@@ -126,14 +153,14 @@ function RequestHackVerification(address HackSubmitter, string memory IPFS, addr
     }
     QuestionsCounter++;
 
-    Hack_.HackVerificationID[HackSubmitter][Hack_.Counter[HackSubmitter]] = RealityMock_(RealityMockAddress).askQuestion(2, AskingQ, KlerosProxy, uint32(block.timestamp+86400), 0, 0);
+    Hack_.HackVerificationID[HackSubmitter][Hack_.Counter[HackSubmitter]] = RealityMock_(RealityAddress).askQuestion(2, AskingQ, KlerosProxyAddress, uint32(block.timestamp+86400), 0, 0);
 
    return AskingQ;
 }
 
-function GetComplexity(string memory IPFS, address RealityMockAddress) external returns(bytes32){
+function GetComplexity(string memory IPFS) external returns(bytes32){
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-    SubmittedSystem_.Complexity = RealityMock_(RealityMockAddress).resultFor(Questions[IPFS].ComplexityID);
+    SubmittedSystem_.Complexity = RealityMock_(RealityAddress).resultFor(Questions[IPFS].ComplexityID);
     return SubmittedSystem_.Complexity;
 }
 
@@ -145,14 +172,14 @@ function GetComplexityNoCall(string memory IPFS) external view returns(bytes32){
 }
 
 
-function GetHack(address HackSubmitter, string memory IPFS, address RealityMockAddress, address MockEscrow, address MockToken, address MockStakerAddress) public {
+function GetHack(address HackSubmitter, string memory IPFS) public {
     Hack storage Hack_ = Hacks[IPFS];
-    Hack_.HackVerificationAnswer[HackSubmitter][Hack_.Counter[HackSubmitter]] = RealityMock_(RealityMockAddress).resultFor(Hack_.HackVerificationID[HackSubmitter][Hack_.Counter[HackSubmitter]]);
+    Hack_.HackVerificationAnswer[HackSubmitter][Hack_.Counter[HackSubmitter]] = RealityMock_(RealityAddress).resultFor(Hack_.HackVerificationID[HackSubmitter][Hack_.Counter[HackSubmitter]]);
     bytes32 hackstatus = Hack_.HackVerificationAnswer[HackSubmitter][Hack_.Counter[HackSubmitter]];
     uint hackstatusnumeric = uint(hackstatus);
 
     if (hackstatusnumeric > 0) {
-    MockEscrow_(MockEscrow).PayHacker(IPFS, address(this), hackstatusnumeric, HackSubmitter,  MockToken, MockStakerAddress);
+    MockEscrow_(EscrowAddress).PayHacker(IPFS, hackstatusnumeric, HackSubmitter);
     Hack_.HackSeverities[Hack_.SeveritiesCounter] = hackstatusnumeric;
     Hack_.SeveritiesCounter++;
 }
@@ -166,7 +193,7 @@ function GetHack(address HackSubmitter, string memory IPFS, address RealityMockA
 
 
 
-    function SubmitSystem(string memory IPFS, int StakingTimeWindow, int TimeWindow, int AuditorRepLevel, int TotalRep, int Bounty, address KlerosProxy, address RealityMockAddress) public { 
+    function SubmitSystem(string memory IPFS, int StakingTimeWindow, int TimeWindow, int AuditorRepLevel, int TotalRep, int Bounty) public { 
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
         require(SubmittedSystem_.SetDetails != true);
         SubmittedSystem_.Stakeable=false;
@@ -178,13 +205,13 @@ function GetHack(address HackSubmitter, string memory IPFS, address RealityMockA
         SubmittedSystem_.Bounty=Bounty;
         SubmittedSystem_.SubmitterAddress=msg.sender;
         SubmittedSystem_.SetDetails=true;
-        RequestComplexity(IPFS, KlerosProxy, RealityMockAddress);
+        RequestComplexity(IPFS);
     }
 
-    function FundSystem(string memory IPFS, address payable EscrowAddress, address MockTokenAddress )public{
+    function FundSystem(string memory IPFS )public{
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
         int StakingPayment=SubmittedSystem_.Bounty*SubmittedSystem_.TotalRep;
-        MockToken_(MockTokenAddress).Transfer(msg.sender, EscrowAddress, StakingPayment);
+        MockToken_(TokenAddress).Transfer(msg.sender, EscrowAddress, StakingPayment);
     }
 
    /* function GetSystemDetails(string memory IPFS) public view returns(int, int, int, int, int, int, int, int, bool, bytes memory ){
@@ -196,13 +223,13 @@ function GetHack(address HackSubmitter, string memory IPFS, address RealityMockA
 
     //should StakeRep happen in Auditors Contract?
 
-    function StakeRep(string memory IPFS, int Rep, address AuditorsContract, address AuditorAddress) public{
+    function StakeRep(string memory IPFS, int Rep, address AuditorAddress) public{
 
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-        int StakerRep = MockStaker_(AuditorsContract).GetAvailableRep(AuditorAddress);
+        int StakerRep = MockStaker_(StakerAdress).GetAvailableRep(AuditorAddress);
         require (Rep <= SubmittedSystem_.TotalRep && StakerRep >= Rep && SubmittedSystem_.Stakeable == true);
        
-        MockStaker_(AuditorsContract).UpdateStakedRep(IPFS, AuditorAddress, Rep);
+        MockStaker_(StakerAdress).UpdateStakedRep(IPFS, AuditorAddress, Rep);
         SubmittedSystem_.RepStaked=SubmittedSystem_.RepStaked+Rep;
         
         if (SubmittedSystem_.RepStaked==SubmittedSystem_.TotalRep){
@@ -249,10 +276,10 @@ function GetHack(address HackSubmitter, string memory IPFS, address RealityMockA
     }
 
 
-    function SubmitHack(string memory IPFS, string memory ExplanationURI, address RealityMockAddress, address KlerosProxy) public {
+    function SubmitHack(string memory IPFS, string memory ExplanationURI) public {
         Hack storage Hack_ = Hacks[IPFS];
         Hack_.HackURI[msg.sender][Hack_.Counter[msg.sender]] = ExplanationURI;
-        RequestHackVerification(msg.sender, IPFS, KlerosProxy, RealityMockAddress); 
+        RequestHackVerification(msg.sender, IPFS); 
 
 
     }

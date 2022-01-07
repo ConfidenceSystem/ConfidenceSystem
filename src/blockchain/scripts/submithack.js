@@ -14,40 +14,50 @@ async function main() {
   
 
 
-    const SystemSubmitter = await hre.ethers.getContractFactory("SubmitSystemContract");
-    const systemsubmitter = await SystemSubmitter.deploy();
-    await systemsubmitter.deployed();
-    console.log("submitter deployed to:", systemsubmitter.address);
 
-    const MockStaker = await hre.ethers.getContractFactory("MockStaker");
-    const mockstaker = await MockStaker.deploy();
-    await mockstaker.deployed();
-    console.log("mockstaker deployed to:", mockstaker.address);
+      const accounts = await hre.ethers.getSigners();   
 
-    MockEscrow = await hre.ethers.getContractFactory("MockEscrow")
-    const mockescrow = await MockEscrow.deploy();
-    await mockescrow.deployed();
-    console.log("mockescrow deployed to:", mockescrow.address);
 
-    RealityMock = await hre.ethers.getContractFactory("RealityMock")
-    const realitymock = await RealityMock.deploy();
-    await realitymock.deployed();
-    console.log("realitymock deployed to:", realitymock.address);
-
-    MockToken = await hre.ethers.getContractFactory("MockToken")
-    const mocktoken = await MockToken.deploy();
-    await mocktoken.deployed();
-    console.log("mocktoken deployed to:", mocktoken.address);
-
-    const accounts = await hre.ethers.getSigners();   
-
+      const MockStaker = await hre.ethers.getContractFactory("MockStaker");
+      const mockstaker = await MockStaker.deploy(accounts[0].address);
+      await mockstaker.deployed();
+      console.log("mockstaker deployed to:", mockstaker.address);
+  
+      MockEscrow = await hre.ethers.getContractFactory("MockEscrow")
+      const mockescrow = await MockEscrow.deploy(accounts[0].address);
+      await mockescrow.deployed();
+      console.log("mockescrow deployed to:", mockescrow.address);
+  
+      RealityMock = await hre.ethers.getContractFactory("RealityMock")
+      const realitymock = await RealityMock.deploy();
+      await realitymock.deployed();
+      console.log("realitymock deployed to:", realitymock.address);
+  
+      MockToken = await hre.ethers.getContractFactory("MockToken")
+      const mocktoken = await MockToken.deploy(accounts[0].address);
+      await mocktoken.deployed();
+      console.log("mocktoken deployed to:", mocktoken.address);
+  
+  
+      const SystemSubmitter = await hre.ethers.getContractFactory("SubmitSystemContract");
+      const systemsubmitter = await SystemSubmitter.deploy(accounts[0].address);
+      await systemsubmitter.deployed();
+      console.log("submitter deployed to:", systemsubmitter.address);
+  
+      await systemsubmitter.SetAddress(mockstaker.address,mockescrow.address,mocktoken.address,realitymock.address,accounts[3].address);
+      await mockescrow.SetAddress(mockstaker.address, systemsubmitter.address, mocktoken.address, realitymock.address, accounts[3].address);
+      await mocktoken.SetAddress(mockescrow.address, systemsubmitter.address, mockstaker.address, realitymock.address, accounts[3].address);
+      await mockstaker.SetAddress(mockescrow.address, systemsubmitter.address, mocktoken.address, realitymock.address, accounts[3].address);
+    
+  
+  
 
     
     await mockstaker.SetRep(accounts[1].address)
     await mocktoken.SetBalance(accounts[0].address, 1200);
 
-    await systemsubmitter.SubmitSystem('blah', 2, 2, 0, 600, 2, accounts[3].address, realitymock.address);
-    await systemsubmitter.GetComplexity('blah',realitymock.address);
+    await systemsubmitter.SubmitSystem('blah', 2, 2, 0, 600, 2);
+    await systemsubmitter.GetComplexity('blah');
 
 
    let account0bal = await mocktoken.GetBalancePublic(accounts[0].address);
@@ -59,21 +69,21 @@ async function main() {
    console.log("Auditor balance is:", account1bal);
    console.log("Auditor rep is:", account1rep);
 
-    await systemsubmitter.FundSystem('blah', mockescrow.address, mocktoken.address)
+    await systemsubmitter.FundSystem('blah')
 
     await systemsubmitter.StartStakingWindow('blah');
-    await systemsubmitter.StakeRep('blah', 500, mockstaker.address, accounts[1].address);
+    await systemsubmitter.StakeRep('blah', 500, accounts[1].address);
     sleep(5000);
     await systemsubmitter.StartTimeWindow('blah'); 
     console.log("time window started");
     await systemsubmitter.connect(accounts[2]).SubmitHackHash('blah', 'bleh');
-    await systemsubmitter.connect(accounts[2]).SubmitHack('blah', 'bleh', realitymock.address, accounts[3].address);
-    await systemsubmitter.connect(accounts[2]).GetHack(accounts[2].address,'blah', realitymock.address, mockescrow.address, mocktoken.address, mockstaker.address);
+    await systemsubmitter.connect(accounts[2]).SubmitHack('blah', 'bleh');
+    await systemsubmitter.connect(accounts[2]).GetHack(accounts[2].address,'blah');
     sleep(5000);
 
 
-    await mockescrow.PayOut('blah',systemsubmitter.address,mockstaker.address, accounts[1].address, mocktoken.address, realitymock.address);
-    await mockescrow.ReturnUnstaked('blah',systemsubmitter.address,mocktoken.address);
+    await mockescrow.PayOut('blah', accounts[1].address);
+    await mockescrow.ReturnUnstaked('blah');
 
     account0bal = await mocktoken.GetBalancePublic(accounts[0].address);
     account1bal = await mocktoken.GetBalancePublic(accounts[1].address);

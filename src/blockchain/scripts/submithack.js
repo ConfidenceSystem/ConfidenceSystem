@@ -49,6 +49,7 @@ async function main() {
     await systemsubmitter.SubmitSystem('blah', 2, 2, 0, 600, 2, accounts[3].address, realitymock.address);
     await systemsubmitter.GetComplexity('blah',realitymock.address);
 
+
    let account0bal = await mocktoken.GetBalancePublic(accounts[0].address);
    let account1bal = await mocktoken.GetBalancePublic(accounts[1].address);
    let account1rep = await mockstaker.GetTotalRep(accounts[1].address);
@@ -65,7 +66,11 @@ async function main() {
     sleep(5000);
     await systemsubmitter.StartTimeWindow('blah'); 
     console.log("time window started");
+    await systemsubmitter.connect(accounts[2]).SubmitHackHash('blah', 'bleh');
+    await systemsubmitter.connect(accounts[2]).SubmitHack('blah', 'bleh', realitymock.address, accounts[3].address);
+    await systemsubmitter.connect(accounts[2]).GetHack(accounts[2].address,'blah', realitymock.address, mockescrow.address, mocktoken.address, mockstaker.address);
     sleep(5000);
+
 
     await mockescrow.PayOut('blah',systemsubmitter.address,mockstaker.address, accounts[1].address, mocktoken.address, realitymock.address);
     await mockescrow.ReturnUnstaked('blah',systemsubmitter.address,mocktoken.address);
@@ -73,30 +78,16 @@ async function main() {
     account0bal = await mocktoken.GetBalancePublic(accounts[0].address);
     account1bal = await mocktoken.GetBalancePublic(accounts[1].address);
     account1rep = await mockstaker.GetTotalRep(accounts[1].address);
+    account2bal= await mocktoken.GetBalancePublic(accounts[2].address);
+    account2rep = await mockstaker.GetTotalRep(accounts[2].address);
 
 
     console.log("Submitter balance is:", account0bal);
     console.log("Auditor balance is:", account1bal);
     console.log("Auditor rep is:", account1rep);
+    console.log("hacker balance is:", account2bal);
+    console.log("hacker rep is :", account2rep);
     
-
-
-    
-    
-  
-
-
-
-
-// const SystemDetails = await systemsubmitter.GetSystemDetails('blah');
-
-
- //  for (i=0; i<10; i++){
- //  console.log(SystemDetails[i],)
- //  }
-
-   
-
 }
 
 main()

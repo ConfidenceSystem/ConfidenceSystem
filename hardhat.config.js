@@ -1,8 +1,6 @@
 require("@nomiclabs/hardhat-waffle")
 require('dotenv').config()
 
-const RPC_URL = process.env.RPC_URL
-const PRIVATE_KEY = process.env.PRIVATE_KEY
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners()
@@ -20,13 +18,5 @@ module.exports = {
     artifacts: './src/frontend/artifacts',
     tests: './tests/blockchain'
   },
-  networks: {
-    hardhat: {
-      chainId: 1337
-    },
-    rinkeby: {
-      url: RPC_URL,
-      accounts: [`0x${PRIVATE_KEY}`]
-    }
-  }
+  
 };

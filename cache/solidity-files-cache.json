@@ -1,0 +1,270 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/jack/CodeProjects/omfg4/Ethereum-Audit/src/blockchain/contracts/Greeter.sol": {
+      "lastModificationDate": 1641589158923,
+      "contentHash": "54c28c84e5277b35b8c8329ce9755dae",
+      "sourceName": "src/blockchain/contracts/Greeter.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Greeter"
+      ]
+    },
+    "/Users/jack/CodeProjects/omfg4/Ethereum-Audit/node_modules/hardhat/console.sol": {
+      "lastModificationDate": 1641589557917,
+      "contentHash": "cc4777addd464ea56fa35b1c45df0591",
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "console"
+      ]
+    },
+    "/Users/jack/CodeProjects/omfg4/Ethereum-Audit/src/blockchain/contracts/SubmitSystemContract.sol": {
+      "lastModificationDate": 1641589158924,
+      "contentHash": "e03b5f4ea0c6c707992f88c2b3e6d33f",
+      "sourceName": "src/blockchain/contracts/SubmitSystemContract.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "MockEscrow_",
+        "MockStaker_",
+        "MockToken_",
+        "RealityMock_",
+        "SubmitSystemContract"
+      ]
+    },
+    "/Users/jack/CodeProjects/omfg4/Ethereum-Audit/src/blockchain/contracts/RealityMock.sol": {
+      "lastModificationDate": 1641589158924,
+      "contentHash": "472f26b5fc1bd0ec796b1f2792ac3a26",
+      "sourceName": "src/blockchain/contracts/RealityMock.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "RealityMock"
+      ]
+    },
+    "/Users/jack/CodeProjects/omfg4/Ethereum-Audit/src/blockchain/contracts/MockToken.sol": {
+      "lastModificationDate": 1641589158924,
+      "contentHash": "c48214cd9eed7eeb8f2a9407e6608c0a",
+      "sourceName": "src/blockchain/contracts/MockToken.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "MockToken"
+      ]
+    },
+    "/Users/jack/CodeProjects/omfg4/Ethereum-Audit/src/blockchain/contracts/MockStaker.sol": {
+      "lastModificationDate": 1641589158923,
+      "contentHash": "9d4fa787aeb81b6f52a27635a1fa811f",
+      "sourceName": "src/blockchain/contracts/MockStaker.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "MockStaker",
+        "SubmitSystemContract_"
+      ]
+    },
+    "/Users/jack/CodeProjects/omfg4/Ethereum-Audit/src/blockchain/contracts/MockEscrow.sol": {
+      "lastModificationDate": 1641589158923,
+      "contentHash": "c2b52cc45e4547370237908ac1ee5b2e",
+      "sourceName": "src/blockchain/contracts/MockEscrow.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "MockEscrow",
+        "MockStaker_",
+        "MockToken_",
+        "SubmitSystemContract_"
+      ]
+    }
+  }
+}

@@ -17,7 +17,7 @@ async function main() {
     const accounts = await hre.ethers.getSigners();   
 
 
-    const MockStaker = await hre.ethers.getContractFactory("MockStaker");
+    const MockStaker = await hre.ethers.getContractFactory("src/blockchain/contracts/MockStaker");
     const mockstaker = await MockStaker.deploy(accounts[0].address);
     await mockstaker.deployed();
     console.log("mockstaker deployed to:", mockstaker.address);

@@ -73,7 +73,7 @@ SubmitterAddress=SubmitterAddress_;
 
     function PayHacker(string memory IPFS,  uint hackstatusnumeric, address HackerAddress) external{
 
-    int hackerpayout = ((SubmitSystemContract_(SubmitterAddress).GetBounty(IPFS))*(SubmitSystemContract_(SubmitterAddress).GetStakedRep(IPFS)));
+    int hackerpayout = ((SubmitSystemContract_(SubmitterAddress).GetStakedRep(IPFS)));
     hackerpayout=(int(fundsfactor[hackstatusnumeric])*hackerpayout);
     hackerpayout = hackerpayout/100;
 
@@ -97,7 +97,7 @@ SubmitterAddress=SubmitterAddress_;
          uint currenttime = block.timestamp;
          require (currenttime>TimeEnd, "you fucked it");//&& (SubmitSystemContract_(SubmitterAddress).GetTimeWindowStarted(IPFS)) == true);
          MockStaker_(StakerAdress).BurnRep(IPFS,AuditorAddress);
-        payout = ((SubmitSystemContract_(SubmitterAddress).GetBounty(IPFS))*(MockStaker_(StakerAdress).GetStakedRep(IPFS, AuditorAddress)));
+        payout = ((MockStaker_(StakerAdress).GetStakedRep(IPFS, AuditorAddress)));
         RepStaked = MockStaker_(StakerAdress).GetStakedRep(IPFS, AuditorAddress);
         RepStaked = (RepStaked -(2*(RepStaked)));
 
@@ -109,7 +109,7 @@ SubmitterAddress=SubmitterAddress_;
     function ReturnUnstaked(string memory IPFS) public{
             require (SubmitSystemContract_(SubmitterAddress).GetTimeWindowStarted(IPFS) == true);
             int ReturnedFunds = (SubmitSystemContract_(SubmitterAddress).GetTotalRep(IPFS)) - (SubmitSystemContract_(SubmitterAddress).GetStakedRep(IPFS));
-            ReturnedFunds = ReturnedFunds * (SubmitSystemContract_(SubmitterAddress).GetBounty(IPFS));
+            
             MockToken_(TokenAddress).Transfer(address(this), (SubmitSystemContract_(SubmitterAddress).GetSubmitter(IPFS)), ReturnedFunds);
 
     }

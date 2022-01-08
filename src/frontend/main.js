@@ -7,13 +7,23 @@ import { Greeter } from './greet.js'
 import { SystemSubmitter } from './SystemSubmitter.js'
 
 
-const Main = () => (
 
-  <div id='Main'>    
-<Greeter/>
-<SystemSubmitter/>
-
+class main extends Component {
+ 
+  constructor(props) {
+    super(props);
+    this.state = {IPFS: ''};
+    this.state = {TimeWindow: ''};
+    this.state = {StakingAmount: ''};
+  }
+  render() {
+  return (
+  <div>  
+  <Greeter></Greeter>
+  <SystemSubmitter></SystemSubmitter>
 </div>
 
-)
-ReactDOM.render(<Main/>, document.getElementById('root'))
+  )}}
+  export const Main1 = main
+ 
+ReactDOM.render(<Main1 />, document.getElementById('root'))

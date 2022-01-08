@@ -17,37 +17,38 @@ class SystemSubmitter1 extends Component {
               placeholder="IPFS link to system details and files"
               required />
         <input type="submit"  />
-        </form>
-        <br></br>
-        
-        <h3>Bounty</h3>
-        <form onSubmit={(event) => {
-          
-        
-        }}>
-           <input
+<br/>
+        <input
               id="Bounty"
               type="text"
               className="form-control"
               placeholder="bounty"
               required />
         <input type="submit"  />
-        </form>
-        <br></br>
-        
-        <h3>Staking Window</h3>
-        <form onSubmit={(event) => {
-          
-        
-        }}>
-           <input
+        <br/>
+
+        <input
               id="Staking Window"
               type="text"
               className="form-control"
-              placeholder="staking window"
+              placeholder="Time Window"
               required />
         <input type="submit"  />
+        <br/>
+
+        <input
+              id="RepStakeAmount"
+              type="text"
+              className="form-control"
+              placeholder="RepStakeAmount"
+              required />
+        <input type="submit"  />
+        <br/>
+
         </form>
+        <br></br>
+        
+       
         </div>
       )}}
 

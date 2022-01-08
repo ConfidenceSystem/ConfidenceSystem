@@ -99,9 +99,7 @@ SubmitterAddress=SubmitterAddress_;
          require (currenttime>TimeEnd, "you fucked it");//&& (SubmitSystemContract_(SubmitterAddress).GetTimeWindowStarted(IPFS)) == true);
          MockStaker_(StakerAdress).BurnRep(IPFS,AuditorAddress);
         payout = ((MockStaker_(StakerAdress).GetStakedRep(IPFS, AuditorAddress)));
-        //  RepStaked = MockStaker_(StakerAdress).GetStakedRep(IPFS, AuditorAddress);
-        // RepStaked = (RepStaked -(2*(RepStaked)));
-
+       
         int alreadystaked =MockStaker_(StakerAdress).GetAlreadyStaked(IPFS, AuditorAddress);
         payout = payout*(100-alreadystaked);
         payout = payout/100;

@@ -7,6 +7,7 @@ interface MockStaker_ {
     function GetAvailableRep(address AuditorAddress) external view returns(int);
     function UpdateStakedRep(string memory IPFS, address AuditorAddress, int RepStaked) external;
     function GetStakedRep(string memory IPFS, address AuditorAddress) external view returns(int);
+    function AlreadyStaked(string memory IPFS, address AuditorAddress, int StakedAlready) external;
 }
 
 interface MockEscrow_ {
@@ -222,6 +223,11 @@ function GetHack(address HackSubmitter, string memory IPFS) public {
     function StakeRep(string memory IPFS, int Rep, address AuditorAddress) public{
 
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
+
+        int stakingposition= ((SubmittedSystem_.RepStaked)*100);
+        stakingposition=stakingposition/(SubmittedSystem_.TotalRep);
+        MockStaker_(StakerAdress).AlreadyStaked(IPFS, AuditorAddress, stakingposition);
+
         int StakerRep = MockStaker_(StakerAdress).GetAvailableRep(AuditorAddress);
         require (Rep <= SubmittedSystem_.TotalRep && StakerRep >= Rep && SubmittedSystem_.Stakeable == true);
        

@@ -45,6 +45,8 @@ struct Auditor{
     int AuditorRep;
     int TotalStaked;
     mapping(string => int) StakedRep;
+    mapping(string => int) StakedAlready;
+
 
 }
 
@@ -60,6 +62,17 @@ function GetAvailableRep(address AuditorAddress) external view returns(int){
     Auditor storage Auditor_ = Auditors[AuditorAddress];
     int AvailableRep = Auditor_.AuditorRep - Auditor_.TotalStaked;
     return AvailableRep;
+}
+
+function AlreadyStaked(string memory IPFS, address AuditorAddress, int StakedAlready) external{
+        Auditor storage Auditor_ = Auditors[AuditorAddress];
+        Auditor_.StakedAlready[IPFS]=StakedAlready;
+
+}
+
+function GetAlreadyStaked(string memory IPFS, address AuditorAddress) external view returns(int){
+Auditor storage Auditor_ = Auditors[AuditorAddress];
+     return   Auditor_.StakedAlready[IPFS];
 }
 
 function GetStakedRep(string memory IPFS, address AuditorAddress) external view returns(int){
@@ -100,9 +113,10 @@ function MintRep(string memory IPFS, address AuditorAddress) external{
 
     uint hackseverity = SubmitSystemContract_(SubmitterAddress).GetSeveritiesAggregate(IPFS);
     Auditor storage Auditor_ = Auditors[AuditorAddress];
-    uint RepGain;
-    RepGain = uint(SubmitSystemContract_(SubmitterAddress).GetComplexity(IPFS));
-    int repgain= int(RepGain*100);
+    int repgain = ((Auditor_.StakedRep[IPFS]*10)/100);
+    //RepGain = uint(SubmitSystemContract_(SubmitterAddress).GetComplexity(IPFS));
+   
+    repgain = ((repgain*(100-Auditor_.StakedAlready[IPFS]))/100);
     if (hackseverity>10){
         repgain=0;
     }

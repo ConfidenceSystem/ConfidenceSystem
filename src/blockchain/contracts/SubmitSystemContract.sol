@@ -73,7 +73,6 @@ bool TimeWindowStarted;
 int TotalRep;
 int RepStaked;
 bytes32 Complexity;
-int Bounty;
 bool Stakeable;
 bool SetDetails;
 address SubmitterAddress;
@@ -192,7 +191,7 @@ function GetHack(address HackSubmitter, string memory IPFS) public {
 
 
 
-    function SubmitSystem(string memory IPFS, int StakingTimeWindow, int TimeWindow, int TotalRep, int Bounty) public { 
+    function SubmitSystem(string memory IPFS, int StakingTimeWindow, int TimeWindow, int TotalRep) public { 
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
         require(SubmittedSystem_.SetDetails != true);
         SubmittedSystem_.Stakeable=false;
@@ -200,7 +199,6 @@ function GetHack(address HackSubmitter, string memory IPFS) public {
         SubmittedSystem_.StakingTimeWindow=StakingTimeWindow;
         SubmittedSystem_.TimeWindow=TimeWindow;
         SubmittedSystem_.TotalRep=TotalRep;
-        SubmittedSystem_.Bounty=Bounty;
         SubmittedSystem_.SubmitterAddress=msg.sender;
         SubmittedSystem_.SetDetails=true;
         RequestComplexity(IPFS);
@@ -208,7 +206,7 @@ function GetHack(address HackSubmitter, string memory IPFS) public {
 
     function FundSystem(string memory IPFS )public{
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-        int StakingPayment=SubmittedSystem_.Bounty*SubmittedSystem_.TotalRep;
+        int StakingPayment=SubmittedSystem_.TotalRep;
         MockToken_(TokenAddress).Transfer(msg.sender, EscrowAddress, StakingPayment);
     }
 
@@ -344,11 +342,6 @@ function GetHack(address HackSubmitter, string memory IPFS) public {
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
         return SubmittedSystem_.SubmitterAddress;
 
-    }
-
-    function GetBounty(string memory IPFS) external view returns(int){
-        SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-        return SubmittedSystem_.Bounty;
     }
 
 

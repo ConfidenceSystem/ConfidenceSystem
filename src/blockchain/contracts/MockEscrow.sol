@@ -21,6 +21,7 @@ function MintRep(string memory IPFS, address AuditorAddress) external;
 function MintHackerRep(address AuditorAddress, int RepAmount) external;
 function BurnRep(string memory IPFS, address AuditorAddress) external;
 function ResetStakedRep(string memory IPFS, address AuditorAddress) external;
+function GetAlreadyStaked(string memory IPFS, address AuditorAddress) external view returns(int);
 
 }
 
@@ -98,9 +99,10 @@ SubmitterAddress=SubmitterAddress_;
          require (currenttime>TimeEnd, "you fucked it");//&& (SubmitSystemContract_(SubmitterAddress).GetTimeWindowStarted(IPFS)) == true);
          MockStaker_(StakerAdress).BurnRep(IPFS,AuditorAddress);
         payout = ((MockStaker_(StakerAdress).GetStakedRep(IPFS, AuditorAddress)));
-        RepStaked = MockStaker_(StakerAdress).GetStakedRep(IPFS, AuditorAddress);
-        RepStaked = (RepStaked -(2*(RepStaked)));
-
+       
+        int alreadystaked =MockStaker_(StakerAdress).GetAlreadyStaked(IPFS, AuditorAddress);
+        payout = payout*(100-alreadystaked);
+        payout = payout/100;
         MockStaker_(StakerAdress).MintRep(IPFS, AuditorAddress);
         MockStaker_(StakerAdress).ResetStakedRep(IPFS, AuditorAddress);
         MockToken_(TokenAddress).Transfer(address(this), AuditorAddress, payout);

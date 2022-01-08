@@ -54,7 +54,7 @@ async function main() {
     await mockstaker.SetRep(accounts[1].address)
     await mocktoken.SetBalance(accounts[0].address, 1200);
 
-    await systemsubmitter.SubmitSystem('blah', 2, 2, 600, 2);
+    await systemsubmitter.SubmitSystem('blah', 2, 2, 600);
     await systemsubmitter.GetComplexity('blah');
 
    let account0bal = await mocktoken.GetBalancePublic(accounts[0].address);

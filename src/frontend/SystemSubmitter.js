@@ -18,14 +18,7 @@ class SystemSubmitter1 extends Component {
               required />
         <input type="submit"  />
 <br/>
-        <input
-              id="Bounty"
-              type="text"
-              className="form-control"
-              placeholder="bounty"
-              required />
-        <input type="submit"  />
-        <br/>
+        
 
         <input
               id="Staking Window"

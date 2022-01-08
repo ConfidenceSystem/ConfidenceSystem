@@ -70,7 +70,6 @@ int StakingTimeWindow;
 int TimeWindow;
 bool StakingTimeWindowStarted;
 bool TimeWindowStarted;
-int AuditorRepLevel;
 int TotalRep;
 int RepStaked;
 bytes32 Complexity;
@@ -193,14 +192,13 @@ function GetHack(address HackSubmitter, string memory IPFS) public {
 
 
 
-    function SubmitSystem(string memory IPFS, int StakingTimeWindow, int TimeWindow, int AuditorRepLevel, int TotalRep, int Bounty) public { 
+    function SubmitSystem(string memory IPFS, int StakingTimeWindow, int TimeWindow, int TotalRep, int Bounty) public { 
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
         require(SubmittedSystem_.SetDetails != true);
         SubmittedSystem_.Stakeable=false;
 
         SubmittedSystem_.StakingTimeWindow=StakingTimeWindow;
         SubmittedSystem_.TimeWindow=TimeWindow;
-        SubmittedSystem_.AuditorRepLevel=AuditorRepLevel;
         SubmittedSystem_.TotalRep=TotalRep;
         SubmittedSystem_.Bounty=Bounty;
         SubmittedSystem_.SubmitterAddress=msg.sender;

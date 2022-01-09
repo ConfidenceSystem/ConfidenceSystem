@@ -10,16 +10,10 @@ import { SystemSubmitter } from './SystemSubmitter.js'
 
 class main extends Component {
  
-  constructor(props) {
-    super(props);
-    this.state = {IPFS: ''};
-    this.state = {TimeWindow: ''};
-    this.state = {StakingAmount: ''};
-  }
   render() {
   return (
   <div>  
-  <Greeter></Greeter>
+    <Greeter></Greeter>
   <SystemSubmitter></SystemSubmitter>
 </div>
 

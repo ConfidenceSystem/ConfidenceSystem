@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import { ethers } from "ethers";
 
 
-
 class SystemSubmitter1 extends Component {
     provider = new ethers.providers.Web3Provider(window.ethereum)
+
 
     constructor(props) {
         super(props);
@@ -12,7 +12,6 @@ class SystemSubmitter1 extends Component {
         this.state = {TimeWindow: ''};
         this.state = {StakingAmount: ''};
       }
- // temp =  this.state.StakingAmount;
    
   render() {
       return (

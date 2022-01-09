@@ -6,6 +6,7 @@ async function main() {
    
   
 
+    
 
     const accounts = await hre.ethers.getSigners();   
 
@@ -46,7 +47,14 @@ async function main() {
     
     await mockstaker.SetRep(accounts[1].address)
     await mocktoken.SetBalance(accounts[0].address, 1200);
+
 }
+export const escrow = mockescrow.address
+export const staker = mockstaker.address
+export const systemsubmitter = systemsubmitter.address
+export const token = mocktoken.address
+export const reality = realitymock.address
+
 main()
   .then(() => process.exit(0))
   .catch((error) => {

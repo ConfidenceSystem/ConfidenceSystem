@@ -1,5 +1,5 @@
 # Ethereum-Audit
-An insurance and reputation system for auditors and developers
+An audit, reputation and bounty system for auditors, hackers and developers.
 
 install dependencies with ```yarn```
 

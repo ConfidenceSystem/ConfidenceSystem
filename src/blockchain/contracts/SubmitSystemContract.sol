@@ -67,13 +67,9 @@ SubmitterAddress=address(this);
 
 struct SubmittedSystem{
 
-int StakingTimeWindow;
-int TimeWindow;
 bool StakingTimeWindowStarted;
 bool TimeWindowStarted;
-int TotalRep;
-int RepStaked;
-bytes32 Complexity;
+uint payout;
 bool Stakeable;
 bool SetDetails;
 address SubmitterAddress;
@@ -106,7 +102,7 @@ uint QuestionsCounter;
 
 mapping(string => QuestionHolder) public Questions;
 
-
+/*
 function RequestComplexity(string memory IPFS) internal returns (string memory) {
 
     string memory string1= "what is the complexity of this system?\u241f";
@@ -128,7 +124,7 @@ function RequestComplexity(string memory IPFS) internal returns (string memory) 
    return AskingQ;
 }
 
-function ConcatHackString(string memory IPFS, address HackSubmitter) internal view returns(string memory){
+/*function ConcatHackString(string memory IPFS, address HackSubmitter) internal view returns(string memory){
     string memory string1= "what is the severity of this hack? if hash does not match explanation DO NOT USE\u241f";
     string memory string3='\u241f"1","2","3"\u241feth-technical\u241fen';
     Hack storage Hack_ = Hacks[IPFS];
@@ -137,6 +133,7 @@ function ConcatHackString(string memory IPFS, address HackSubmitter) internal vi
     return  string(abi.encodePacked(string1,ExplanationURI,HackHash,string3));
 
 }
+
 
 function RequestHackVerification(address HackSubmitter, string memory IPFS) internal returns (string memory) {
 
@@ -156,6 +153,7 @@ function RequestHackVerification(address HackSubmitter, string memory IPFS) inte
 
    return AskingQ;
 }
+*/
 
 function GetComplexity(string memory IPFS) external returns(bytes32){
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
@@ -170,7 +168,6 @@ function GetComplexityNoCall(string memory IPFS) external view returns(bytes32){
 
 }
 
-
 function GetHack(address HackSubmitter, string memory IPFS) public {
     Hack storage Hack_ = Hacks[IPFS];
     Hack_.HackVerificationAnswer[HackSubmitter][Hack_.Counter[HackSubmitter]] = RealityMock_(RealityAddress).resultFor(Hack_.HackVerificationID[HackSubmitter][Hack_.Counter[HackSubmitter]]);
@@ -184,26 +181,15 @@ function GetHack(address HackSubmitter, string memory IPFS) public {
 }
 }
 
-
-
-
-
-
-
-
-
-    function SubmitSystem(string memory IPFS, int StakingTimeWindow, int TimeWindow, int TotalRep) public { 
+    function SubmitSystem(string memory IPFS, int TimeWindow, int MinAuditorScore) public { 
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
         require(SubmittedSystem_.SetDetails != true);
         SubmittedSystem_.Stakeable=false;
-
-        SubmittedSystem_.StakingTimeWindow=StakingTimeWindow;
+        SubmittedSystem_.MinAuditorScore=MinAuditorScore;
         SubmittedSystem_.TimeWindow=TimeWindow;
-        SubmittedSystem_.TotalRep=TotalRep;
         SubmittedSystem_.SubmitterAddress=msg.sender;
         SubmittedSystem_.SetDetails=true;
-        RequestComplexity(IPFS);
-    }
+        }
 
     function FundSystem(string memory IPFS )public{
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
@@ -242,10 +228,7 @@ function GetHack(address HackSubmitter, string memory IPFS) public {
 
     function StartStakingWindow(string memory IPFS) public returns (int) {
 
-         
-
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-
         require(SubmittedSystem_.StakingTimeWindowStarted != true);
         SubmittedSystem_.StakingTimeWindowStarted=true;
         int WindowLength = SubmittedSystem_.StakingTimeWindow;
@@ -259,8 +242,6 @@ function GetHack(address HackSubmitter, string memory IPFS) public {
     function StartTimeWindow(string memory IPFS) public {
         
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-
-        
         require(SubmittedSystem_.TimeWindowStarted != true);
         require(int(block.timestamp)>SubmittedSystem_.StakingTimeWindow);
         SubmittedSystem_.TimeWindowStarted=true;

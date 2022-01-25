@@ -7,29 +7,25 @@ contract MockToken {
 
 
 address DeployerAddress;
-
 constructor(address deployeraddress){
-
 DeployerAddress=deployeraddress;
-
 }
 
-address StakerAdress;
-address EscrowAddress;
 address TokenAddress;
-address RealityAddress;
-address KlerosProxyAddress;
-address SubmitterAddress;
+address PayoutsAddress;
+address UsersAddress;
+address SubmittedSystemsAddress;
+address TriageAddress;
+address InterfaceAddress;
 
-    function SetAddress(address EscrowAddress_, address SubmitterAddress_, address StakerAdress_, address RealityAddress_, address KlerosProxyAddress_) public{
-
+function SetAddress(address _TokenAddress, address _PayoutsAddress, address _UsersAddress, address _SubmittedSystemsAddress, address _TriageAddress, address _InterfaceAddress) public{
 require(msg.sender==DeployerAddress);
-StakerAdress=StakerAdress_;
-EscrowAddress=EscrowAddress_;
-TokenAddress=address(this);
-RealityAddress=RealityAddress_;
-KlerosProxyAddress=KlerosProxyAddress_;
-SubmitterAddress=SubmitterAddress_;
+TokenAddress=_TokenAddress;
+PayoutsAddress=_PayoutsAddress;
+UsersAddress= _UsersAddress;
+SubmittedSystemsAddress= _SubmittedSystemsAddress;
+TriageAddress= _TriageAddress;
+InterfaceAddress=_InterfaceAddress;
 
 }
 

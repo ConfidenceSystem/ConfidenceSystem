@@ -22,6 +22,30 @@ interface MockToken_{
 
 contract PayoutsContract {
 
+address DeployerAddress;
+constructor(address deployeraddress){
+DeployerAddress=deployeraddress;
+}
+
+address TokenAddress;
+address PayoutsAddress;
+address UsersAddress;
+address SubmittedSystemsAddress;
+address TriageAddress;
+address InterfaceAddress;
+
+function SetAddress(address _TokenAddress, address _PayoutsAddress, address _UsersAddress, address _SubmittedSystemsAddress, address _TriageAddress, address _InterfaceAddress) public{
+require(msg.sender==DeployerAddress);
+TokenAddress=_TokenAddress;
+PayoutsAddress=address(this);
+UsersAddress= _UsersAddress;
+SubmittedSystemsAddress= _SubmittedSystemsAddress;
+TriageAddress= _TriageAddress;
+InterfaceAddress=_InterfaceAddress;
+
+}
+
+
 
     function AuditPayout(string memory IPFS) external {
    

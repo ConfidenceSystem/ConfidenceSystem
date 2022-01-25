@@ -11,6 +11,30 @@ interface newsubmittedsystems{
 
 contract UsersContract {
 
+address DeployerAddress;
+constructor(address deployeraddress){
+DeployerAddress=deployeraddress;
+}
+
+address TokenAddress;
+address PayoutsAddress;
+address UsersAddress;
+address SubmittedSystemsAddress;
+address TriageAddress;
+address InterfaceAddress;
+
+function SetAddress(address _TokenAddress, address _PayoutsAddress, address _UsersAddress, address _SubmittedSystemsAddress, address _TriageAddress, address _InterfaceAddress) public{
+require(msg.sender==DeployerAddress);
+TokenAddress=_TokenAddress;
+PayoutsAddress=_PayoutsAddress;
+UsersAddress= address(this);
+SubmittedSystemsAddress= _SubmittedSystemsAddress;
+TriageAddress= _TriageAddress;
+InterfaceAddress=_InterfaceAddress;
+
+}
+
+
 
 struct Auditor {
 mapping(uint => string) AuditedContract;

@@ -37,7 +37,7 @@ address InterfaceAddress;
 function SetAddress(address _TokenAddress, address _PayoutsAddress, address _UsersAddress, address _SubmittedSystemsAddress, address _TriageAddress, address _InterfaceAddress) public{
 require(msg.sender==DeployerAddress);
 TokenAddress=_TokenAddress;
-PayoutsAddress=address(this);
+PayoutsAddress=_PayoutsAddress;
 UsersAddress= _UsersAddress;
 SubmittedSystemsAddress= _SubmittedSystemsAddress;
 TriageAddress= _TriageAddress;

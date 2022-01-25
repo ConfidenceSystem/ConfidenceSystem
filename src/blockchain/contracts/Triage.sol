@@ -87,7 +87,7 @@ InterfaceAddress=_InterfaceAddress;
         }
     }
 
-    function RevealVote(string memory _IPFS, uint _HackID, uint256 _Vote, string memory _Nonce, address _Triager) external {
+    function RevealVote(string memory _IPFS, uint _HackID, uint256 _Vote, uint _Nonce, address _Triager) external {
         string memory ID = string (abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
         bytes32 VoteHash = keccak256(abi.encode(_Vote, _Nonce, _IPFS, _HackID)); 
@@ -124,11 +124,10 @@ InterfaceAddress=_InterfaceAddress;
 
     //getters, restricted to view
 
-    function GetPayoutDetails (string memory _IPFS, string memory _HackID) external view returns (address [] memory, uint, uint){
-       
+    function GetPayoutDetails (string memory _IPFS, uint _HackID) external view returns (address [] memory, uint, uint){
         string memory ID = string (abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
-
+        
         uint i;
         address[] memory triagers;
         for (i=0; i< TriageRequest_.TriagerCount; i++){

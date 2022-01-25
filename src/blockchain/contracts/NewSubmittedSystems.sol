@@ -6,7 +6,33 @@ interface UsersContract{
 function GetScore(address auditor) external returns (int);
 }
 
+interface Triage {
+    function MakeTriageRequest(string memory _IPFS, uint _HackID, uint _TriagerCount) external;
+}
+
 contract SubmittedSystemsContract {
+
+address DeployerAddress;
+constructor(address deployeraddress){
+DeployerAddress=deployeraddress;
+}
+
+address TokenAddress;
+address PayoutsAddress;
+address UsersAddress;
+address SubmittedSystemsAddress;
+address TriageAddress;
+address InterfaceAddress;
+
+function SetAddress(address _TokenAddress, address _PayoutsAddress, address _UsersAddress, address _SubmittedSystemsAddress, address _TriageAddress, address _InterfaceAddress) public{
+require(msg.sender==DeployerAddress);
+TokenAddress=_TokenAddress;
+PayoutsAddress=_PayoutsAddress;
+UsersAddress= _UsersAddress;
+SubmittedSystemsAddress= _SubmittedSystemsAddress;
+TriageAddress= _TriageAddress;
+InterfaceAddress=_InterfaceAddress;
+}
 
 struct SubmittedSystem{
 
@@ -47,7 +73,7 @@ function SetAuditor(string memory IPFS, address auditor) external {
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
 
     require (SubmittedSystem_.Auditor == 0x0000000000000000000000000000000000000000);
-    require (UsersContract(UsersContractAddress).GetScore(auditor) > SubmittedSystem_.MinScore);
+    require (UsersContract(UsersAddress).GetScore(auditor) > SubmittedSystem_.MinScore);
 
     SubmittedSystem_.Auditor=auditor;
     SubmittedSystem_.AuditWindowEnd=block.timestamp+100; //figure out how long 2 weeks is in eth time
@@ -62,12 +88,12 @@ function SubmitHackHash(string memory IPFS, string memory HackHash, address Hack
         SubmittedSystemHack storage SubmittedSystemHack_ = SubmittedSystemHacks[IPFS]; 
         
         SubmittedSystemHack_.HackCounter++; //overall hack counter and ID for system
-        SubmittedSystemHack_[HackSubmitter].AddressLocalHackCounter++; //local hack counter and ID for each user that submits vulns
+        SubmittedSystemHack_.AddressLocalHackCounter[HackSubmitter]++; //local hack counter and ID for each user that submits vulns
 
         SubmittedSystemHack_.HackCounterAddress[SubmittedSystemHack_.HackCounter]=HackSubmitter; //address of vuln submitter for this ID
-        SubmittedSystemHack_.HackCounterAddressID[SubmittedSystemHack_.HackCounter]=SubmittedSystemHack_[HackSubmitter].AddressLocalHackCounter; //where in user's submitted vulns this vuln is. i.e position 4
+        SubmittedSystemHack_.HackCounterAddressID[SubmittedSystemHack_.HackCounter]=SubmittedSystemHack_.AddressLocalHackCounter[HackSubmitter]; //where in user's submitted vulns this vuln is. i.e position 4
 
-        SubmittedSystemHack_.HackHash[HackSubmitter][SubmittedSystemHack_[HackSubmitter].AddressLocalHackCounter]=HackHash; //submitting hack hash
+        SubmittedSystemHack_.HackHash[HackSubmitter][SubmittedSystemHack_.AddressLocalHackCounter[HackSubmitter]]=HackHash; //submitting hack hash
         return SubmittedSystemHack_.HackCounter; //returning Hack ID
 }
 
@@ -78,7 +104,8 @@ function SubmitHackURI(string memory IPFS, string memory HackURI, address HackSu
         uint LocalHackID = SubmittedSystemHack_.HackCounterAddressID[HackID]; //getting address specific hack position/id
         SubmittedSystemHack_.HackURI[HackSubmitter][LocalHackID]=HackURI; //submitting URI
 
-        //request triage
+        Triage(TriageAddress).MakeTriageRequest(IPFS, HackID, 4); //making triage request
+
 }   
 
 //Getters, all restricted to view.

@@ -12,12 +12,12 @@ interface newsubmittedsystems{
 }
 
 interface Triage{
-function GetPayoutDetails (string memory _IPFS, string memory _HackID) external view returns (address [] memory, uint);
+function GetPayoutDetails (string memory _IPFS, string memory _HackID) external view returns (address [] memory, uint, uint);
 }
 
 
 interface MockToken_{
-        function Transfer(address sender, address receiver, int amount) external;
+        function Transfer(address sender, address receiver, uint amount) external;
 }
 
 contract PayoutsContract {
@@ -63,7 +63,7 @@ InterfaceAddress=_InterfaceAddress;
     newsubmittedsystems(SubmittedSystemsAddress).AuditorPaid(IPFS);
    
     //actual transfer
-    MockToken_(tokenaddress).Transfer(address(this), auditor, payout);
+    MockToken_(TokenAddress).Transfer(address(this), auditor, payout);
     }
 
     function BountyPayout(string memory IPFS, address Hacker, uint Bounty)external{
@@ -71,7 +71,7 @@ InterfaceAddress=_InterfaceAddress;
     }
 
     function TriagePayout(string memory _IPFS, string memory _HackID) external{
-        address[] triagers;
+        address[] memory triagers;
         uint payout;
         uint triagercount;
         (triagers, payout, triagercount) = Triage(TriageAddress).GetPayoutDetails(_IPFS, _HackID);
@@ -79,7 +79,7 @@ InterfaceAddress=_InterfaceAddress;
         uint i;
         for (i=0; i<triagercount; i++){
             uint triagerpayout = payout/triagercount;
-            MockToken_(tokenaddress).Transfer(address(this), triagers[i], triagerpayout);
+            MockToken_(TokenAddress).Transfer(address(this), triagers[i], triagerpayout);
 
         }
 

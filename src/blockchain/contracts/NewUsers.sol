@@ -46,12 +46,12 @@ mapping (address => Auditor) public Auditors;
 
 function GetScore(address auditor) public returns (int){
     
-    Auditor Auditor_ = Auditors[auditor];
+    Auditor storage Auditor_ = Auditors[auditor];
     //tallies score every time it is requested (is this too expensive?)
     uint i;
     for (i=0;i<Auditor_.ContractCounter+1;i++){
-        uint outcome =  newsubmittedsystems(contractaddress).GetOutcome(Auditor_.AuditedContract[i]);
-        uint AuditWindow = newsubmittedsystems(contractaddress).GetAuditWindow(Auditor_.AuditedContract[i]);
+        int outcome =  int(newsubmittedsystems(SubmittedSystemsAddress).GetOutcome(Auditor_.AuditedContract[i]));
+        uint AuditWindow = newsubmittedsystems(SubmittedSystemsAddress).GetAuditWindow(Auditor_.AuditedContract[i]);
 
         if ((outcome == 0 || outcome == 1)&&(block.timestamp > AuditWindow)){
             outcome = int(outcome);
@@ -86,7 +86,7 @@ uint TriageCounter;
 
 
 function UpdateAvailableTriagers(address user, bool selection) external {
-    Triager Triager_ = Triagers[user];
+    Triager storage Triager_ = Triagers[user];
 
     // Adding a triager
     if (GetScore(user) > 50 && selection == true && Triager_.IsTriager != true){
@@ -103,17 +103,18 @@ function UpdateAvailableTriagers(address user, bool selection) external {
     
     Triager_.IsTriager = false;
     TriagersList[Triager_.position]=TriagersList[TriageCounter];
-    Triager[TriagersList[TriageCounter]].position=Triager_.position;
+    Triager storage Triager1_ = Triagers[TriagersList[TriageCounter]];
+    Triager1_.position  = Triager_.position;
     TriageCounter--;
   
     }
 }
-function GetAvailableTriager(uint position) external returns(address){
+function GetAvailableTriager(uint position) external view returns(address){
 require (position <= TriageCounter);
 return TriagersList[position];
 }
 
-function GetTriageCounter()external returns(uint){
+function GetTriageCounter()external view returns(uint){
     return TriageCounter;
 }
 

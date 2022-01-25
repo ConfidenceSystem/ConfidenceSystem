@@ -63,6 +63,8 @@ uint TriageCounter;
 
 function UpdateAvailableTriagers(address user, bool selection) external {
     Triager Triager_ = Triagers[user];
+
+    // Adding a triager
     if (GetScore(user) > 50 && selection == true && Triager_.IsTriager != true){
    
     Triager_.IsTriager=selection;
@@ -71,6 +73,8 @@ function UpdateAvailableTriagers(address user, bool selection) external {
     Triager_.position=TriageCounter;
   
     }
+
+    // Removing a triager
     else if (selection == false && Triager_.IsTriager == true){
     
     Triager_.IsTriager = false;
@@ -83,6 +87,10 @@ function UpdateAvailableTriagers(address user, bool selection) external {
 function GetAvailableTriager(uint position) external returns(address){
 require (position <= TriageCounter);
 return TriagersList[position];
+}
+
+function GetTriageCounter()external returns(uint){
+    return TriageCounter;
 }
 
 

@@ -42,6 +42,10 @@ contract PayoutsContract {
 
     }
 
+    function TriagePayout(string memory _IPFS, string memory _HackID){
+        
+    }
+
 }
 
 

@@ -8,7 +8,11 @@ interface newsubmittedsystems{
     function GetPayout(string memory IPFS) external view returns (uint);
     function AuditorPaid(string memory IPFS)external;
     function GetAuditorPaid(string memory IPFS)external view returns (bool);
-    function GetOutcome(string memory IPFS) external view returns (uint)
+    function GetOutcome(string memory IPFS) external view returns (uint);
+}
+
+interface Triage{
+function GetPayoutDetails (string memory _IPFS, string memory _HackID) external view returns (address [] memory, uint);
 }
 
 
@@ -42,8 +46,19 @@ contract PayoutsContract {
 
     }
 
-    function TriagePayout(string memory _IPFS, string memory _HackID){
-        
+    function TriagePayout(string memory _IPFS, string memory _HackID) external{
+        address[] triagers;
+        uint payout;
+        uint triagercount;
+        (triagers, payout, triagercount) = Triage(TriageAddress).GetPayoutDetails(_IPFS, _HackID);
+
+        uint i;
+        for (i=0; i<triagercount; i++){
+            uint triagerpayout = payout/triagercount;
+            MockToken_(tokenaddress).Transfer(address(this), triagers[i], triagerpayout);
+
+        }
+
     }
 
 }

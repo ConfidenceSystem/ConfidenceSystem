@@ -84,10 +84,21 @@ contract TriageContract {
             //if consensus is not met, overwrites and gets new triagers
         }
 
-        NewPayouts(PayoutsAddress).TriagerPayout
+        NewPayouts(PayoutsAddress).TriagerPayout;
 
     }
 
+    //getters, restricted to view
+
+    function GetPayoutDetails (string memory _IPFS, string memory _HackID) external view returns (address [] memory, uint, uint){
+        TriageRequest storage TriageRequest_ = TriageRequests[abi.encode(_IPFS, _HackID)];
+        uint i;
+        address[] triagers;
+        for (i=0; i< TriageRequest_.TriagerCount; i++){
+            triagers[i]= TriageRequest_.Triagers[i];
+    }
+    return (triagers, TriageRequest_.TriagePayout, TriageRequest_.TriagerCount);
+    }
 
 
 

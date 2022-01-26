@@ -7,7 +7,7 @@ function GetAvailableTriager(uint _position) external returns(address);
 function GetTriageCounter()external returns(uint);
 }
 
-interface PayoutsContract {
+interface Payouts {
     function TriagePayout(string memory _IPFS, uint _HackID) external;
 }
 
@@ -118,7 +118,7 @@ InterfaceAddress=_InterfaceAddress;
             //if consensus is not met, overwrites and gets new triagers
         }
 
-        PayoutsContract(PayoutsAddress).TriagePayout(_IPFS, _HackID);
+        Payouts(PayoutsAddress).TriagePayout(_IPFS, _HackID);
 
     }
 

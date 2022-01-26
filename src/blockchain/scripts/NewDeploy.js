@@ -17,20 +17,27 @@ async function main() {
     const accounts = await hre.ethers.getSigners();   
 
 
-    const MockStaker = await hre.ethers.getContractFactory("MockStaker");
-    const mockstaker = await MockStaker.deploy(accounts[0].address);
-    await mockstaker.deployed();
-    console.log("mockstaker deployed to:", mockstaker.address);
 
-    MockEscrow = await hre.ethers.getContractFactory("MockEscrow")
-    const mockescrow = await MockEscrow.deploy(accounts[0].address);
-    await mockescrow.deployed();
-    console.log("mockescrow deployed to:", mockescrow.address);
 
-    RealityMock = await hre.ethers.getContractFactory("RealityMock")
-    const realitymock = await RealityMock.deploy();
-    await realitymock.deployed();
-    console.log("realitymock deployed to:", realitymock.address);
+    Interface = await hre.ethers.getContractFactory("InterfaceContract")
+    const interface = await Interface.deploy(accounts[0].address);
+    await interface.deployed();
+    console.log("interface deployed to:", interface.address);
+
+    SubmittedSystems1 = await hre.ethers.getContractFactory("SubmittedSystemsContract")
+    const submittedsystems = await SubmittedSystems1.deploy(accounts[0].address);
+    await submittedsystems.deployed();
+    console.log("submittedsystems deployed to:", submittedsystems.address);
+
+    Payouts = await hre.ethers.getContractFactory("PayoutsContract")
+    const payouts = await Payouts.deploy(accounts[0].address);
+    await payouts.deployed();
+    console.log("payouts deployed to:", payouts.address);
+
+    const NewUsers = await hre.ethers.getContractFactory("NewUsersContract");
+    const users = await NewUsers.deploy(accounts[0].address);
+    await users.deployed();
+    console.log("users deployed to:", users.address);
 
     MockToken = await hre.ethers.getContractFactory("MockToken")
     const mocktoken = await MockToken.deploy(accounts[0].address);
@@ -38,19 +45,23 @@ async function main() {
     console.log("mocktoken deployed to:", mocktoken.address);
 
 
-    const SystemSubmitter = await hre.ethers.getContractFactory("SubmitSystemContract");
-    const systemsubmitter = await SystemSubmitter.deploy(accounts[0].address);
-    await systemsubmitter.deployed();
-    console.log("submitter deployed to:", systemsubmitter.address);
+    Triage = await hre.ethers.getContractFactory("TriageContract")
+    const triage = await Triage.deploy(accounts[0].address);
+    await triage.deployed();
+    console.log("triage deployed to:", triage.address);
 
-    await systemsubmitter.SetAddress(mockstaker.address,mockescrow.address,mocktoken.address,realitymock.address,accounts[3].address);
-    await mockescrow.SetAddress(mockstaker.address, systemsubmitter.address, mocktoken.address, realitymock.address, accounts[3].address);
-    await mocktoken.SetAddress(mockescrow.address, systemsubmitter.address, mockstaker.address, realitymock.address, accounts[3].address);
-    await mockstaker.SetAddress(mockescrow.address, systemsubmitter.address, mocktoken.address, realitymock.address, accounts[3].address);
+
+    await interface.SetAddress(mocktoken.address, payouts.address, users.address, submittedsystems.address, triage.address, interface.address);
+    await submittedsystems.SetAddress(mocktoken.address, payouts.address, users.address, submittedsystems.address, triage.address, interface.address);
+    await users.SetAddress(mocktoken.address, payouts.address, users.address, submittedsystems.address, triage.address, interface.address);
+    await payouts.SetAddress(mocktoken.address, payouts.address, users.address, submittedsystems.address, triage.address, interface.address);
+    await mocktoken.SetAddress(mocktoken.address, payouts.address, users.address, submittedsystems.address, triage.address, interface.address);
+    await triage.SetAddress(mocktoken.address, payouts.address, users.address, submittedsystems.address, triage.address, interface.address);
+
   
 
 
-    
+    /*
     await mockstaker.SetRep(accounts[1].address)
     await mocktoken.SetBalance(accounts[0].address, 1200);
 
@@ -104,7 +115,7 @@ async function main() {
  //  }
 
    
-
+*/
 }
 
 main()

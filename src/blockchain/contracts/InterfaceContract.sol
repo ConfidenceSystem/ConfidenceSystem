@@ -18,7 +18,7 @@ interface Payouts{
     function TriagePayout(string memory _IPFS, uint _HackID) external;
 }
 
-contract NewInterface {
+contract InterfaceContract {
 
 address DeployerAddress;
 constructor(address deployeraddress){

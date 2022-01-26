@@ -9,7 +9,7 @@ interface newsubmittedsystems{
 }
 
 
-contract UsersContract {
+contract NewUsersContract {
 
 address DeployerAddress;
 constructor(address deployeraddress){

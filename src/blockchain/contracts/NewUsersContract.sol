@@ -1,7 +1,7 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
-interface newsubmittedsystems{
+interface SubmittedSystems{
     function GetAuditWindow(string memory IPFS) external view returns(uint);
     function GetAuditor(string memory IPFS) external view returns(address);
     function GetPayout(string memory IPFS) external view returns (uint);
@@ -27,7 +27,7 @@ function SetAddress(address _TokenAddress, address _PayoutsAddress, address _Use
 require(msg.sender==DeployerAddress);
 TokenAddress=_TokenAddress;
 PayoutsAddress=_PayoutsAddress;
-UsersAddress= address(this);
+UsersAddress= _UsersAddress;
 SubmittedSystemsAddress= _SubmittedSystemsAddress;
 TriageAddress= _TriageAddress;
 InterfaceAddress=_InterfaceAddress;
@@ -50,8 +50,8 @@ function GetScore(address auditor) public returns (int){
     //tallies score every time it is requested (is this too expensive?)
     uint i;
     for (i=0;i<Auditor_.ContractCounter+1;i++){
-        int outcome =  int(newsubmittedsystems(SubmittedSystemsAddress).GetOutcome(Auditor_.AuditedContract[i]));
-        uint AuditWindow = newsubmittedsystems(SubmittedSystemsAddress).GetAuditWindow(Auditor_.AuditedContract[i]);
+        int outcome =  int(SubmittedSystems(SubmittedSystemsAddress).GetOutcome(Auditor_.AuditedContract[i]));
+        uint AuditWindow = SubmittedSystems(SubmittedSystemsAddress).GetAuditWindow(Auditor_.AuditedContract[i]);
 
         if ((outcome == 0 || outcome == 1)&&(block.timestamp > AuditWindow)){
             outcome = int(outcome);

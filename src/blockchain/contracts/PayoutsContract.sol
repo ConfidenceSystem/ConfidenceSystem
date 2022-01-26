@@ -17,7 +17,7 @@ function GetPayoutDetails (string memory _IPFS, string memory _HackID) external 
 
 
 interface MockToken_{
-        function Transfer(address sender, address receiver, uint amount) external;
+        function Transfer(address sender, address receiver, int amount) external;
 }
 
 contract PayoutsContract {
@@ -55,7 +55,7 @@ InterfaceAddress=_InterfaceAddress;
     uint  payout = newsubmittedsystems(SubmittedSystemsAddress).GetPayout(IPFS);
    
     //checking stuff
-    require(block.timestamp > auditwindow);
+    //require(block.timestamp > auditwindow);
     require (newsubmittedsystems(SubmittedSystemsAddress).GetAuditorPaid(IPFS) != true);
     require (newsubmittedsystems(SubmittedSystemsAddress).GetOutcome(IPFS) == 1);
    
@@ -63,7 +63,7 @@ InterfaceAddress=_InterfaceAddress;
     newsubmittedsystems(SubmittedSystemsAddress).AuditorPaid(IPFS);
    
     //actual transfer
-    MockToken_(TokenAddress).Transfer(address(this), auditor, payout);
+    MockToken_(TokenAddress).Transfer(address(this), auditor, int (payout));
     }
 
     function BountyPayout(string memory IPFS, address Hacker, uint Bounty)external{
@@ -79,7 +79,7 @@ InterfaceAddress=_InterfaceAddress;
         uint i;
         for (i=0; i<triagercount; i++){
             uint triagerpayout = payout/triagercount;
-            MockToken_(TokenAddress).Transfer(address(this), triagers[i], triagerpayout);
+            MockToken_(TokenAddress).Transfer(address(this), triagers[i], int (triagerpayout));
 
         }
 

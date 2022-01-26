@@ -2,11 +2,16 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 
-interface UsersContract{
+interface Users{
 function GetScore(address auditor) external returns (int);
 }
 
-interface Triage {
+interface mocktoken {
+    function Transfer(address sender, address receiver, int amount) external;
+
+}
+
+interface Triage{
     function MakeTriageRequest(string memory _IPFS, uint _HackID, uint _TriagerCount) external;
 }
 
@@ -60,10 +65,13 @@ mapping (string => SubmittedSystem) public SubmittedSystems;
 mapping (string => SubmittedSystemHack) public SubmittedSystemHacks;
 
 
-function SubmitSystem(string memory IPFS, int MinAuditorScore, uint Payout) external {
+function SubmitSystem(string memory IPFS, int MinAuditorScore, uint Payout, address Submitter) public {
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
     require (SubmittedSystem_.SetDetails != true);
     SubmittedSystem_.SetDetails=true;
+    SubmittedSystem_.Outcome=1;
+    mocktoken(TokenAddress).Transfer(Submitter, PayoutsAddress, int(Payout)); // puts money in escrow
+    SubmittedSystem_.SubmitterAddress=Submitter;
     SubmittedSystem_.Payout=Payout;
     SubmittedSystem_.MinScore=MinAuditorScore;
 
@@ -73,7 +81,7 @@ function SetAuditor(string memory IPFS, address auditor) external {
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
 
     require (SubmittedSystem_.Auditor == 0x0000000000000000000000000000000000000000);
-    require (UsersContract(UsersAddress).GetScore(auditor) > SubmittedSystem_.MinScore);
+    require (Users(UsersAddress).GetScore(auditor) >= SubmittedSystem_.MinScore);
 
     SubmittedSystem_.Auditor=auditor;
     SubmittedSystem_.AuditWindowEnd=block.timestamp+100; //figure out how long 2 weeks is in eth time

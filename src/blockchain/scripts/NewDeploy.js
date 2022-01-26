@@ -61,42 +61,26 @@ async function main() {
   
 
 
-    /*
-    await mockstaker.SetRep(accounts[1].address)
-    await mocktoken.SetBalance(accounts[0].address, 1200);
+    await mocktoken.SetBalance(accounts[0].address, 150);
 
-    await systemsubmitter.SubmitSystem('blah', 2, 2, 600);
-    await systemsubmitter.GetComplexity('blah');
 
-   let account0bal = await mocktoken.GetBalancePublic(accounts[0].address);
-   let account1bal = await mocktoken.GetBalancePublic(accounts[1].address);
-   let account1rep = await mockstaker.GetTotalRep(accounts[1].address);
+    let account0bal = await mocktoken.GetBalancePublic(accounts[0].address);
+    let account1bal = await mocktoken.GetBalancePublic(accounts[1].address);
 
 
    console.log("Submitter balance is:", account0bal);
    console.log("Auditor balance is:", account1bal);
-   console.log("Auditor rep is:", account1rep);
 
-    await systemsubmitter.FundSystem('blah')
-
-    await systemsubmitter.StartStakingWindow('blah');
-    await systemsubmitter.StakeRep('blah', 500, accounts[1].address);
-    sleep(5000);
-    await systemsubmitter.StartTimeWindow('blah'); 
-    console.log("time window started");
-    sleep(5000);
-
-    await mockescrow.PayOut('blah', accounts[1].address);
-    await mockescrow.ReturnUnstaked('blah');
+    await interface.SubmitSystem('blah', 0, 100);
+    await interface.connect(accounts[1]).Audit('blah');
+    await interface.RequestAuditPayout('blah');
 
     account0bal = await mocktoken.GetBalancePublic(accounts[0].address);
     account1bal = await mocktoken.GetBalancePublic(accounts[1].address);
-    account1rep = await mockstaker.GetTotalRep(accounts[1].address);
 
 
     console.log("Submitter balance is:", account0bal);
     console.log("Auditor balance is:", account1bal);
-    console.log("Auditor rep is:", account1rep);
     
 
 
@@ -114,8 +98,6 @@ async function main() {
  //  console.log(SystemDetails[i],)
  //  }
 
-   
-*/
 }
 
 main()

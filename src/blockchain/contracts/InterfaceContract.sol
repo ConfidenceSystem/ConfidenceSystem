@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 
 interface SubmittedSystems {
-function SubmitSystem(string memory IPFS, int MinAuditorScore, uint Payout) external;
+function SubmitSystem(string memory IPFS, int MinAuditorScore, uint Payout, address Submitter) external;
 function SetAuditor(string memory IPFS, address auditor) external;
 function SubmitHackHash(string memory IPFS, string memory HackHash, address HackSubmitter)external returns (uint);
 function SubmitHackURI(string memory IPFS, string memory HackURI, address HackSubmitter, uint HackID) external;
@@ -46,7 +46,7 @@ InterfaceAddress=address(this);
 
 
     function SubmitSystem(string memory IPFS, int MinAuditorScore, uint FundsAmount) public {
-        SubmittedSystems(SubmittedSystemsAddress).SubmitSystem(IPFS, MinAuditorScore, FundsAmount);
+        SubmittedSystems(SubmittedSystemsAddress).SubmitSystem(IPFS, MinAuditorScore, FundsAmount, msg.sender);
     }
 
     function Audit(string memory IPFS) public{

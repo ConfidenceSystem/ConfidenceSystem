@@ -4,6 +4,7 @@ import "hardhat/console.sol";
 
 interface Users{
 function GetScore(address auditor) external returns (int);
+function UpdateAuditedContracts(address auditor, string memory IPFS) external;
 }
 
 interface mocktoken {
@@ -82,7 +83,7 @@ function SetAuditor(string memory IPFS, address auditor) external {
 
     require (SubmittedSystem_.Auditor == 0x0000000000000000000000000000000000000000);
     require (Users(UsersAddress).GetScore(auditor) >= SubmittedSystem_.MinScore);
-
+    Users(UsersAddress).UpdateAuditedContracts(auditor, IPFS);
     SubmittedSystem_.Auditor=auditor;
     SubmittedSystem_.AuditWindowEnd=block.timestamp+100; //figure out how long 2 weeks is in eth time
 }

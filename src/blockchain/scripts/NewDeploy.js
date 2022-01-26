@@ -74,6 +74,8 @@ async function main() {
     await interface.SubmitSystem('blah', 0, 100);
     await interface.connect(accounts[1]).Audit('blah');
     await interface.RequestAuditPayout('blah');
+    await users.GetScore(accounts[1].address);
+    let score = await users.ViewScore(accounts[1].address);
 
     account0bal = await mocktoken.GetBalancePublic(accounts[0].address);
     account1bal = await mocktoken.GetBalancePublic(accounts[1].address);
@@ -81,7 +83,8 @@ async function main() {
 
     console.log("Submitter balance is:", account0bal);
     console.log("Auditor balance is:", account1bal);
-    
+    console.log("Auditor score is:", score);
+
 
 
     

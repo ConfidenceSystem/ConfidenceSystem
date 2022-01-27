@@ -72,7 +72,7 @@ InterfaceAddress=_InterfaceAddress;
         uint256 i;
         uint256 TriageCounter = NewUsers(UsersAddress).GetTriageCounter();
         for (i = 0; i < TriageRequest_.TriagerCount; i++) {
-        TriageRequest_.Triagers[i] = NewUsers(UsersAddress).GetAvailableTriager(uint256(keccak256(abi.encode(randomness, i))) % TriageCounter);
+        TriageRequest_.Triagers[i] = NewUsers(UsersAddress).GetAvailableTriager(uint256(keccak256(abi.encode(randomness, i))) % TriageCounter); // Getting random triagers
         }
 
     }
@@ -80,11 +80,9 @@ InterfaceAddress=_InterfaceAddress;
     function CommitVoteHash(string memory _IPFS, uint256 _HackID, bytes32 _VoteHash, address _Triager) external returns(bytes32) {
         string memory ID = string (abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
-        bool IsTriager;
         uint256 i;
-        for (i=0; i<=TriageRequest_.TriagerCount; i++){
-            if (TriageRequest_.Triagers[i]==_Triager){
-                IsTriager=true;
+        for (i=0; i<TriageRequest_.TriagerCount; i++){ 
+            if (TriageRequest_.Triagers[i]==_Triager){ //checking triager is eligible
                 TriageRequest_.VoteHash[_Triager]=_VoteHash;
 
 
@@ -112,10 +110,10 @@ InterfaceAddress=_InterfaceAddress;
         //require(block.timestamp > TriageRequest_.TriageWindowEnd);
         uint256 i;
         uint256[10] memory tally;
-        for (i=0; i<= TriageRequest_.TriagerCount; i++){
+        for (i=0; i< TriageRequest_.TriagerCount; i++){
             address triager = TriageRequest_.Triagers[i];
-            tally[TriageRequest_.Vote[triager]]++;
-            if (tally[TriageRequest_.Vote[triager]] == (TriageRequest_.TriagerCount)){
+            tally[TriageRequest_.Vote[triager]]++; //get triagers vote, and tallies that position in array
+            if (tally[TriageRequest_.Vote[triager]] == (TriageRequest_.TriagerCount)){ //if the amount of votes on certain severity == amount of triagers, sets outcome to that severity
                 TriageRequest_.Outcome=TriageRequest_.Vote[triager];
             }
 

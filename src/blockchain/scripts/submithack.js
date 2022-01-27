@@ -119,7 +119,7 @@ async function main() {
             let triager= await triage.GetTriager('blah',1,a);
             if(accounts[i].address == triager){
                 triagerbal = await mocktoken.GetBalancePublic(accounts[i].address)
-                console.log("triager balance is", triagerbal, i);
+                console.log("triager balance is", triagerbal, accounts[i].address);
 
             }
 

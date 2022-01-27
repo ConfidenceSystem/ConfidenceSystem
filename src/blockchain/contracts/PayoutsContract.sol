@@ -77,9 +77,11 @@ InterfaceAddress=_InterfaceAddress;
       (triagers, payout, triagercount) = Triage(TriageAddress).GetPayoutDetails(_IPFS, _HackID);
 
         uint i;
+        int triagerpayout = int (payout/triagercount);
+        
+
         for (i=0; i<triagercount; i++){
-            uint triagerpayout = payout/triagercount;
-            MockToken_(TokenAddress).Transfer(address(this), triagers[i], int (triagerpayout));
+            MockToken_(TokenAddress).Transfer(address(this), triagers[i], (triagerpayout));
 
         }
 

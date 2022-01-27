@@ -71,7 +71,7 @@ InterfaceAddress=_InterfaceAddress;
         uint256 randomness = uint256(blockhash(block.number)); // will do chainlink mocks later
         uint256 i;
         uint256 TriageCounter = NewUsers(UsersAddress).GetTriageCounter();
-        for (i = 0; i <= TriageCounter; i++) {
+        for (i = 0; i < TriageRequest_.TriagerCount; i++) {
         TriageRequest_.Triagers[i] = NewUsers(UsersAddress).GetAvailableTriager(uint256(keccak256(abi.encode(randomness, i))) % TriageCounter);
         }
 
@@ -115,7 +115,7 @@ InterfaceAddress=_InterfaceAddress;
         for (i=0; i<= TriageRequest_.TriagerCount; i++){
             address triager = TriageRequest_.Triagers[i];
             tally[TriageRequest_.Vote[triager]]++;
-            if (tally[TriageRequest_.Vote[triager]] == (TriageRequest_.TriagerCount)-1){
+            if (tally[TriageRequest_.Vote[triager]] == (TriageRequest_.TriagerCount)){
                 TriageRequest_.Outcome=TriageRequest_.Vote[triager];
             }
 
@@ -140,7 +140,7 @@ InterfaceAddress=_InterfaceAddress;
         
         uint256 i;
         address[10] memory triagers;
-        for (i=0; i< TriageRequest_.TriagerCount; i++){
+        for (i=0; i<= TriageRequest_.TriagerCount; i++){
             triagers[i]= TriageRequest_.Triagers[i];
     }
     return (triagers, TriageRequest_.TriagePayout, TriageRequest_.TriagerCount);

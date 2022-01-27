@@ -75,7 +75,7 @@ async function main() {
     await interface.connect(accounts[1]).Audit('blah');
     
     let i=0;
-    for(i=3; i<12; i++){
+    for(i=3; i<=19; i++){
         await users.connect(accounts[i]).SetAuditorScoreTESTING(accounts[i].address);
         await interface.connect(accounts[i]).BecomeTriager();
     }
@@ -83,9 +83,9 @@ async function main() {
     await interface.connect(accounts[2]).SubmitHackHash('blah','samplehackhash');
     await interface.connect(accounts[2]).SubmitHackURI('blah','samplehackURI',1);
 
-    for(i=3; i<12; i++){
+    for(i=3; i<=19; i++){
 
-        for(a=0;a<5;a++){
+        for(a=0;a<=4;a++){
             let triager= await triage.GetTriager('blah',1,a);
             if(accounts[i].address == triager){
                 let hash = hre.ethers.utils.solidityKeccak256(["uint256","uint256","string","uint256"],[3, 67, 'blah', 1]);
@@ -113,13 +113,13 @@ async function main() {
     console.log("Auditor balance is:", account1bal);
     console.log("Auditor score is:", score);
 
-    for(i=3; i<12; i++){
+    for(i=3; i<=19; i++){
 
-        for(a=0;a<4;a++){
+        for(a=0;a<=4;a++){
             let triager= await triage.GetTriager('blah',1,a);
             if(accounts[i].address == triager){
                 triagerbal = await mocktoken.GetBalancePublic(accounts[i].address)
-                console.log("triager balance is", triagerbal);
+                console.log("triager balance is", triagerbal, i);
 
             }
 
@@ -128,6 +128,8 @@ async function main() {
     }
   
 
+    account0bal = await mocktoken.GetBalancePublic(accounts[0].address);
+    console.log("Submitter balance is:", account0bal);
 
 
 

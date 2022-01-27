@@ -61,7 +61,7 @@ function GetScore(address auditor) public returns (int){
         int outcome =  int(SubmittedSystems(SubmittedSystemsAddress).GetOutcome(Auditor_.AuditedContract[i]));
         uint AuditWindow = SubmittedSystems(SubmittedSystemsAddress).GetAuditWindow(Auditor_.AuditedContract[i]);
 
-        if (outcome == 0 || outcome == 1)//&&(block.timestamp > AuditWindow))
+        if ((outcome == 0 || outcome == 1) &&(block.timestamp > AuditWindow))
         {
             outcome = int(outcome);
             Auditor_.Score=Auditor_.Score+outcome;
@@ -79,6 +79,11 @@ function ViewScore(address auditor) public view returns(int){
         Auditor storage Auditor_ = Auditors[auditor];
         return Auditor_.Score;
 
+}
+
+function SetAuditorScoreTESTING(address auditor)public{
+    Auditor storage Auditor_ = Auditors[auditor];
+    Auditor_.Score=100;
 }
 
  
@@ -104,7 +109,10 @@ function UpdateAvailableTriagers(address user, bool selection) external {
     Triager storage Triager_ = Triagers[user];
 
     // Adding a triager
-    if (GetScore(user) > 50 && selection == true && Triager_.IsTriager != true){
+   // if (GetScore(user) > 50 && selection == true && Triager_.IsTriager != true){
+     if(ViewScore(user) > 50 && selection == true && Triager_.IsTriager != true)   {
+
+     
    
     Triager_.IsTriager=selection;
     TriageCounter++;

@@ -72,43 +72,45 @@ InterfaceAddress=_InterfaceAddress;
 
     }
 
-    function CommitVoteHash(string memory _IPFS, uint _HackID, bytes32 _VoteHash, address _Triager) external {
+    function CommitVoteHash(string memory _IPFS, uint256 _HackID, bytes32 _VoteHash, address _Triager) external returns(bytes32) {
         string memory ID = string (abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
         bool IsTriager;
         uint i;
-        for (i=0; i<TriageRequest_.TriagerCount; i++){
+        for (i=0; i<=TriageRequest_.TriagerCount; i++){
             if (TriageRequest_.Triagers[i]==_Triager){
                 IsTriager=true;
+                TriageRequest_.VoteHash[_Triager]=_VoteHash;
+
+
             }
         }
-        if (TriageRequest_.Triagers[i]==_Triager){
-         TriageRequest_.VoteHash[_Triager] = _VoteHash;
-        }
+        return TriageRequest_.VoteHash[_Triager];
     }
 
-    function RevealVote(string memory _IPFS, uint _HackID, uint256 _Vote, uint _Nonce, address _Triager) external {
+    function RevealVote(string memory _IPFS, uint256 _HackID, uint256 _Vote, uint256 _Nonce, address _Triager) external {
         string memory ID = string (abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
-        bytes32 VoteHash = keccak256(abi.encode(_Vote, _Nonce, _IPFS, _HackID)); 
-        require (VoteHash == TriageRequest_.VoteHash[_Triager]); //Checking Hash
+        bytes32 VoteHash = keccak256(abi.encodePacked(_Vote, _Nonce, _IPFS, _HackID)); 
+        require (VoteHash == TriageRequest_.VoteHash[_Triager], 'hashes dont match'); //Checking Hash
+     if (VoteHash == TriageRequest_.VoteHash[_Triager]){
         TriageRequest_.Vote[_Triager]=_Vote;
-
+     }
         //store used nonces and spot check
         //if you can get a Triager's vote before reveal, they are penalized and you are rewarded.
     }
 
-    function GetVoteOutcome(string memory _IPFS, uint _HackID) external {
+    function GetVoteOutcome(string memory _IPFS, uint _HackID) public {
         string memory ID = string (abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
 
-        require(block.timestamp > TriageRequest_.TriageWindowEnd);
+        //require(block.timestamp > TriageRequest_.TriageWindowEnd);
         uint i;
-        uint[] memory tally;
-        for (i=0; i< TriageRequest_.TriagerCount; i++){
+        uint[99] memory tally;
+        for (i=0; i<= TriageRequest_.TriagerCount; i++){
             address triager = TriageRequest_.Triagers[i];
             tally[TriageRequest_.Vote[triager]]++;
-            if (tally[TriageRequest_.Vote[triager]] == TriageRequest_.TriagerCount){
+            if (tally[TriageRequest_.Vote[triager]] == (TriageRequest_.TriagerCount)-1){
                 TriageRequest_.Outcome=TriageRequest_.Vote[triager];
             }
 
@@ -118,7 +120,10 @@ InterfaceAddress=_InterfaceAddress;
             //if consensus is not met, overwrites and gets new triagers
         }
 
-        Payouts(PayoutsAddress).TriagePayout(_IPFS, _HackID);
+        if (TriageRequest_.Outcome != 9){
+        //Payouts(PayoutsAddress).TriagePayout(_IPFS, _HackID);
+            //if consensus is not met, overwrites and gets new triagers
+        }
 
     }
 
@@ -134,6 +139,20 @@ InterfaceAddress=_InterfaceAddress;
             triagers[i]= TriageRequest_.Triagers[i];
     }
     return (triagers, TriageRequest_.TriagePayout, TriageRequest_.TriagerCount);
+    }
+
+    function GetTriager(string memory _IPFS, uint _HackID, uint position) public view returns (address){
+        string memory ID = string (abi.encode(_IPFS, _HackID));
+        TriageRequest storage TriageRequest_ = TriageRequests[ID];
+        address triager = TriageRequest_.Triagers[position];
+        return triager;
+    }
+
+    function getoutcome(string memory _IPFS, uint _HackID) public view returns(uint){
+        string memory ID = string (abi.encode(_IPFS, _HackID));
+        TriageRequest storage TriageRequest_ = TriageRequests[ID];
+        return TriageRequest_.Outcome;
+
     }
 
 

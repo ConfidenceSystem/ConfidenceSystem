@@ -18,6 +18,10 @@ interface Payouts{
     function TriagePayout(string memory _IPFS, uint _HackID) external;
 }
 
+interface users {
+    function UpdateAvailableTriagers(address user, bool selection) external;
+}
+
 contract InterfaceContract {
 
 address DeployerAddress;
@@ -62,10 +66,14 @@ InterfaceAddress=address(this);
         SubmittedSystems(SubmittedSystemsAddress).SubmitHackURI(IPFS, HackURI, msg.sender, HackID);
     }
 
-    function TriageVoteHash(string memory _IPFS, uint _HackID, bytes32 _VoteHash) public{
+    function BecomeTriager() public {
+        users(UsersAddress).UpdateAvailableTriagers(msg.sender, true);
+    }
+
+    function TriageVoteHash(string memory _IPFS, uint256 _HackID, bytes32 _VoteHash) public{
         Triage(TriageAddress).CommitVoteHash(_IPFS, _HackID, _VoteHash, msg.sender);
     }
-    function RevealTriageVote(string memory _IPFS, uint _HackID, uint _Vote, uint _Nonce) public {
+    function RevealTriageVote(string memory _IPFS, uint256 _HackID, uint256 _Vote, uint256 _Nonce) public {
         Triage(TriageAddress).RevealVote(_IPFS, _HackID, _Vote, _Nonce, msg.sender);
     }
 

@@ -85,13 +85,13 @@ async function main() {
 
     for(i=3; i<12; i++){
 
-        for(a=0;a<4;a++){
+        for(a=0;a<5;a++){
             let triager= await triage.GetTriager('blah',1,a);
             if(accounts[i].address == triager){
-                let hash = hre.ethers.utils.solidityKeccak256(["uint256","uint256","string","uint256"],[2, 67, 'blah', 1]);
+                let hash = hre.ethers.utils.solidityKeccak256(["uint256","uint256","string","uint256"],[3, 67, 'blah', 1]);
                 await interface.connect(accounts[i]).TriageVoteHash('blah', 1, hash);
                 
-                await triage.connect(accounts[i]).RevealVote('blah',1, 2, 67, accounts[i].address);
+                await triage.connect(accounts[i]).RevealVote('blah',1, 3, 67, accounts[i].address);
                 console.log("vote submitted")
 
             }
@@ -101,7 +101,7 @@ async function main() {
     await triage.GetVoteOutcome('blah',1);
     outcome = await triage.getoutcome('blah',1);
     console.log("outcome is:", outcome);
-    await interface.RequestAuditPayout('blah');
+   // await interface.RequestAuditPayout('blah');
     await users.GetScore(accounts[1].address);
     let score = await users.ViewScore(accounts[1].address);
 
@@ -113,10 +113,19 @@ async function main() {
     console.log("Auditor balance is:", account1bal);
     console.log("Auditor score is:", score);
 
+    for(i=3; i<12; i++){
 
+        for(a=0;a<4;a++){
+            let triager= await triage.GetTriager('blah',1,a);
+            if(accounts[i].address == triager){
+                triagerbal = await mocktoken.GetBalancePublic(accounts[i].address)
+                console.log("triager balance is", triagerbal);
 
+            }
+
+        }
     
-    
+    }
   
 
 

@@ -61,12 +61,12 @@ function GetScore(address auditor) public returns (int){
         int outcome =  int(SubmittedSystems(SubmittedSystemsAddress).GetOutcome(Auditor_.AuditedContract[i]));
         uint AuditWindow = SubmittedSystems(SubmittedSystemsAddress).GetAuditWindow(Auditor_.AuditedContract[i]);
 
-        if ((outcome == 0 || outcome == 1) &&(block.timestamp > AuditWindow))
+        if ((outcome == 0 || outcome == 1) /*&&(block.timestamp > AuditWindow)*/)
         {
             outcome = int(outcome);
             Auditor_.Score=Auditor_.Score+outcome;
         }
-        else if (outcome > 1 && block.timestamp > AuditWindow){
+        else if (outcome > 1 /*&& block.timestamp > AuditWindow*/){
             outcome = int(outcome);
             Auditor_.Score=Auditor_.Score - (outcome*10);
         }

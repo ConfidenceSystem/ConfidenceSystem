@@ -12,7 +12,7 @@ interface newsubmittedsystems{
 }
 
 interface Triage{
-function GetPayoutDetails (string memory _IPFS, string memory _HackID) external view returns (address [] memory, uint, uint);
+function GetPayoutDetails (string memory _IPFS, uint256 _HackID) external view returns (address [10] memory, uint, uint);
 }
 
 
@@ -70,11 +70,11 @@ InterfaceAddress=_InterfaceAddress;
 
     }
 
-    function TriagePayout(string memory _IPFS, string memory _HackID) external{
-        address[] memory triagers;
+    function TriagePayout(string memory _IPFS, uint256 _HackID) external{
+        address[10] memory triagers;
         uint payout;
         uint triagercount;
-        (triagers, payout, triagercount) = Triage(TriageAddress).GetPayoutDetails(_IPFS, _HackID);
+      (triagers, payout, triagercount) = Triage(TriageAddress).GetPayoutDetails(_IPFS, _HackID);
 
         uint i;
         for (i=0; i<triagercount; i++){

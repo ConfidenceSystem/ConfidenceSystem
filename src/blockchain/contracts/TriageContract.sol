@@ -3,12 +3,17 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 
 interface NewUsers {
-function GetAvailableTriager(uint _position) external returns(address);
-function GetTriageCounter()external returns(uint);
+function GetAvailableTriager(uint256 _position) external returns(address);
+function GetTriageCounter()external returns(uint256);
 }
 
 interface Payouts {
-    function TriagePayout(string memory _IPFS, uint _HackID) external;
+    function TriagePayout(string memory _IPFS, uint256 _HackID) external;
+
+}
+
+interface SubmittedSystem {
+   function SetOutcome(string memory _IPFS, uint256 outcome) external;
 }
 
 contract TriageContract {
@@ -39,19 +44,19 @@ InterfaceAddress=_InterfaceAddress;
 
     struct TriageRequest {
         string IPFS;
-        uint HackID;
-        uint TriageWindowEnd;
-        uint TriagerCount;
-        mapping (uint => address) Triagers;
+        uint256 HackID;
+        uint256 TriageWindowEnd;
+        uint256 TriagerCount;
+        mapping (uint256 => address) Triagers;
         mapping (address => bytes32) VoteHash;
-        mapping (address => uint) Vote; 
-        uint Outcome;
-        uint TriagePayout;
+        mapping (address => uint256) Vote; 
+        uint256 Outcome;
+        uint256 TriagePayout;
     }
 
     mapping (string => TriageRequest) public TriageRequests;
 
-    function MakeTriageRequest(string memory _IPFS, uint _HackID, uint _TriagerCount) public {
+    function MakeTriageRequest(string memory _IPFS, uint256 _HackID, uint256 _TriagerCount) public {
 
         //setting request details
         string memory ID = string (abi.encode(_IPFS, _HackID));
@@ -63,11 +68,11 @@ InterfaceAddress=_InterfaceAddress;
         TriageRequest_.TriageWindowEnd = block.timestamp+100; // starts triage window, will figure out equivalent of 3 days in unix time
         TriageRequest_.Outcome=9; //0 is in use as a valid outcome, so this just signifies that consensus hasn't been found yet
         //getting triagers
-        uint randomness = uint(blockhash(block.number)); // will do chainlink mocks later
-        uint i;
-        uint TriageCounter = NewUsers(UsersAddress).GetTriageCounter();
+        uint256 randomness = uint256(blockhash(block.number)); // will do chainlink mocks later
+        uint256 i;
+        uint256 TriageCounter = NewUsers(UsersAddress).GetTriageCounter();
         for (i = 0; i <= TriageCounter; i++) {
-        TriageRequest_.Triagers[i] = NewUsers(UsersAddress).GetAvailableTriager(uint(keccak256(abi.encode(randomness, i))) % TriageCounter);
+        TriageRequest_.Triagers[i] = NewUsers(UsersAddress).GetAvailableTriager(uint256(keccak256(abi.encode(randomness, i))) % TriageCounter);
         }
 
     }
@@ -76,7 +81,7 @@ InterfaceAddress=_InterfaceAddress;
         string memory ID = string (abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
         bool IsTriager;
-        uint i;
+        uint256 i;
         for (i=0; i<=TriageRequest_.TriagerCount; i++){
             if (TriageRequest_.Triagers[i]==_Triager){
                 IsTriager=true;
@@ -100,13 +105,13 @@ InterfaceAddress=_InterfaceAddress;
         //if you can get a Triager's vote before reveal, they are penalized and you are rewarded.
     }
 
-    function GetVoteOutcome(string memory _IPFS, uint _HackID) public {
+    function GetVoteOutcome(string memory _IPFS, uint256 _HackID) public {
         string memory ID = string (abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
 
         //require(block.timestamp > TriageRequest_.TriageWindowEnd);
-        uint i;
-        uint[99] memory tally;
+        uint256 i;
+        uint256[10] memory tally;
         for (i=0; i<= TriageRequest_.TriagerCount; i++){
             address triager = TriageRequest_.Triagers[i];
             tally[TriageRequest_.Vote[triager]]++;
@@ -121,34 +126,34 @@ InterfaceAddress=_InterfaceAddress;
         }
 
         if (TriageRequest_.Outcome != 9){
-        //Payouts(PayoutsAddress).TriagePayout(_IPFS, _HackID);
-            //if consensus is not met, overwrites and gets new triagers
+            SubmittedSystem(SubmittedSystemsAddress).SetOutcome(_IPFS, TriageRequest_.Outcome);
+            Payouts(PayoutsAddress).TriagePayout(_IPFS, _HackID);
         }
 
     }
 
     //getters, restricted to view
 
-    function GetPayoutDetails (string memory _IPFS, uint _HackID) external view returns (address [] memory, uint, uint){
+    function GetPayoutDetails (string memory _IPFS, uint256 _HackID) external view returns (address [10] memory, uint256, uint256){
         string memory ID = string (abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
         
-        uint i;
-        address[] memory triagers;
+        uint256 i;
+        address[10] memory triagers;
         for (i=0; i< TriageRequest_.TriagerCount; i++){
             triagers[i]= TriageRequest_.Triagers[i];
     }
     return (triagers, TriageRequest_.TriagePayout, TriageRequest_.TriagerCount);
     }
 
-    function GetTriager(string memory _IPFS, uint _HackID, uint position) public view returns (address){
+    function GetTriager(string memory _IPFS, uint256 _HackID, uint256 position) public view returns (address){
         string memory ID = string (abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
         address triager = TriageRequest_.Triagers[position];
         return triager;
     }
 
-    function getoutcome(string memory _IPFS, uint _HackID) public view returns(uint){
+    function getoutcome(string memory _IPFS, uint256 _HackID) public view returns(uint256){
         string memory ID = string (abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
         return TriageRequest_.Outcome;

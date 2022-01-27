@@ -117,6 +117,12 @@ function SubmitHackURI(string memory IPFS, string memory HackURI, address HackSu
 
 }   
 
+function SetOutcome(string memory IPFS, uint outcome) external{
+    SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
+    SubmittedSystem_.Outcome=outcome;
+
+}
+
 //Getters, all restricted to view.
 
 function GetOutcome(string memory IPFS) external view returns (uint){

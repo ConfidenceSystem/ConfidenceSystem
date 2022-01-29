@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
@@ -43,7 +43,7 @@ PayoutsAddress=_PayoutsAddress;
 UsersAddress= _UsersAddress;
 SubmittedSystemsAddress= _SubmittedSystemsAddress;
 TriageAddress= _TriageAddress;
-InterfaceAddress=address(this);
+InterfaceAddress=_InterfaceAddress;
 
 }
 

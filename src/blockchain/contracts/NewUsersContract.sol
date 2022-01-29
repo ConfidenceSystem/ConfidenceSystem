@@ -1,3 +1,5 @@
+//SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 
@@ -62,7 +64,7 @@ function GetScore(address auditor) public returns (int){
     uint i;
     for (i=0;i<Auditor_.ContractCounter+1;i++){
         int outcome =  int(SubmittedSystems(SubmittedSystemsAddress).GetOutcome(Auditor_.AuditedContract[i]));
-        uint AuditWindow = SubmittedSystems(SubmittedSystemsAddress).GetAuditWindow(Auditor_.AuditedContract[i]);
+       // uint AuditWindow = SubmittedSystems(SubmittedSystemsAddress).GetAuditWindow(Auditor_.AuditedContract[i]);
 
         if ((outcome == 0 || outcome == 1) /*&&(block.timestamp > AuditWindow)*/)
         {

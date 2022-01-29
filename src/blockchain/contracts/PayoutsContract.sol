@@ -1,3 +1,4 @@
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
@@ -48,7 +49,7 @@ InterfaceAddress=_InterfaceAddress;
     function AuditPayout(string memory IPFS) external {
    
     //get details    
-    uint auditwindow=newsubmittedsystems(SubmittedSystemsAddress).GetAuditWindow(IPFS);
+   // uint auditwindow=newsubmittedsystems(SubmittedSystemsAddress).GetAuditWindow(IPFS);
     address auditor=newsubmittedsystems(SubmittedSystemsAddress).GetAuditor(IPFS);
     uint  payout = newsubmittedsystems(SubmittedSystemsAddress).GetPayout(IPFS);
    

@@ -1,6 +1,7 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface NewUsers {
 function GetAvailableTriager(uint256 _position) external returns(address);

@@ -1,3 +1,5 @@
+//SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
@@ -7,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FidesToken is Ownable, ERC20 {
    
-    constructor() public ERC20("FidesToken", "FID") {
+    constructor() ERC20("FidesToken", "FID") {
         
     }
 

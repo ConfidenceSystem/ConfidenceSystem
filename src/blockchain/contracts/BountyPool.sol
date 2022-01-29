@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-interface MockToken_{
-    function Transfer(address sender, address receiver, int amount) external;
-    function GetBalance(address Account) external view returns(int);    
-
+interface FidesTokenContract{
+    function mint (uint amount, address receiver) external;
+    function burn (uint amount, address receiver) external;
 }
 
 
@@ -18,18 +18,18 @@ address DeployerAddress;
 constructor(address deployeraddress){
 DeployerAddress=deployeraddress;
 }
-address SystemTokenAddress;
-address TokenAddress;
+address FidesToken;
+address MockStableCoin;
 address PayoutsAddress;
 address UsersAddress;
 address SubmittedSystemsAddress;
 address TriageAddress;
 address InterfaceAddress;
 
-function SetAddress(address _SystemTokenAddress, address _TokenAddress, address _PayoutsAddress, address _UsersAddress, address _SubmittedSystemsAddress, address _TriageAddress, address _InterfaceAddress) public{
+function SetAddress(address _FidesToken, address _MockStableCoin, address _PayoutsAddress, address _UsersAddress, address _SubmittedSystemsAddress, address _TriageAddress, address _InterfaceAddress) public{
 require(msg.sender==DeployerAddress);
-SystemTokenAddress=_SystemTokenAddress;
-TokenAddress=_TokenAddress;
+FidesToken=_FidesToken;
+MockStableCoin=_MockStableCoin;
 PayoutsAddress=_PayoutsAddress;
 UsersAddress= _UsersAddress;
 SubmittedSystemsAddress= _SubmittedSystemsAddress;
@@ -39,46 +39,35 @@ InterfaceAddress=_InterfaceAddress;
 }
 
 
+function StakeBounty(uint _Amount, address _Staker) external {
 
+  uint Totalbalance = IERC20(MockStableCoin).balanceOf(PayoutsAddress);
+  uint Sharesamount = IERC20(FidesToken).totalSupply();
 
-struct BountyStaker {
+  if(Totalbalance==0||Sharesamount==0){
+    IERC20(MockStableCoin).transferFrom(_Staker, PayoutsAddress, _Amount);
+    FidesTokenContract(FidesToken).mint(_Amount, _Staker);
 
-    uint AmountStaked;
+  }
+  else{
+    uint what = _Amount * (Sharesamount/Totalbalance);
+    IERC20(MockStableCoin).transferFrom(_Staker, PayoutsAddress, _Amount);
+    FidesTokenContract(FidesToken).mint(what, _Staker);
+  }
 
 }
 
-mapping (address => BountyStaker) public Stakers;
-
-uint TotalPool;
-uint DailyPoolContributions;
-uint dailyearnings;
-
-function StakeBounty(int amount, address staker) external {
-
-  int totalbalance = MockToken_(TokenAddress).GetBalance(PayoutsAddress);
-  int sharesamount = MockToken_(SystemTokenAddress).GetBalance(address(this));
-
-  int amounttomint=amount*(sharesamount/totalbalance);
-
-
-
+function Withdraw(uint _Amount, address _Staker) external{
     
-}
+uint Totalbalance = IERC20(MockStableCoin).balanceOf(PayoutsAddress);
+uint Sharesamount = IERC20(FidesToken).totalSupply();
 
-function WithdrawBounty(uint amount, address staker) external{
+uint payout = _Amount * (Totalbalance/Sharesamount);
+IERC20(MockStableCoin).transferFrom(PayoutsAddress, _Staker, payout);
+FidesTokenContract(FidesToken).burn(_Amount, _Staker);
 
-    int totalbalance = MockToken_(TokenAddress).GetBalance(PayoutsAddress);
-    int sharesamount = MockToken_(SystemTokenAddress).GetBalance(address(this));
-
-    int amountToRealease = usershares/totalshares * totalbalance;
-
-}
-
-function DistributeEarnings() public {
-    
 
 }
-
 
 
 }

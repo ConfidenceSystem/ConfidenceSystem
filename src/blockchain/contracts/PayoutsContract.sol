@@ -1,6 +1,9 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 
 interface newsubmittedsystems{
     function GetAuditWindow(string memory IPFS) external view returns(uint);
@@ -15,11 +18,6 @@ interface Triage{
 function GetPayoutDetails (string memory _IPFS, uint256 _HackID) external view returns (address [10] memory, uint, uint);
 }
 
-
-interface MockToken_{
-        function Transfer(address sender, address receiver, int amount) external;
-}
-
 contract PayoutsContract {
 
 address DeployerAddress;
@@ -27,16 +25,16 @@ constructor(address deployeraddress){
 DeployerAddress=deployeraddress;
 }
 
-address TokenAddress;
+address MockStableCoin;
 address PayoutsAddress;
 address UsersAddress;
 address SubmittedSystemsAddress;
 address TriageAddress;
 address InterfaceAddress;
 
-function SetAddress(address _TokenAddress, address _PayoutsAddress, address _UsersAddress, address _SubmittedSystemsAddress, address _TriageAddress, address _InterfaceAddress) public{
+function SetAddress(address _MockStableCoin, address _PayoutsAddress, address _UsersAddress, address _SubmittedSystemsAddress, address _TriageAddress, address _InterfaceAddress) public{
 require(msg.sender==DeployerAddress);
-TokenAddress=_TokenAddress;
+MockStableCoin=_MockStableCoin;
 PayoutsAddress=_PayoutsAddress;
 UsersAddress= _UsersAddress;
 SubmittedSystemsAddress= _SubmittedSystemsAddress;
@@ -63,7 +61,7 @@ InterfaceAddress=_InterfaceAddress;
     newsubmittedsystems(SubmittedSystemsAddress).AuditorPaid(IPFS);
    
     //actual transfer
-    MockToken_(TokenAddress).Transfer(address(this), auditor, int (payout));
+    IERC20(MockStableCoin).transferFrom(address(this), auditor,  payout);
     }
 
     function BountyPayout(string memory IPFS, address Hacker, uint Bounty)external{
@@ -77,11 +75,11 @@ InterfaceAddress=_InterfaceAddress;
       (triagers, payout, triagercount) = Triage(TriageAddress).GetPayoutDetails(_IPFS, _HackID);
 
         uint i;
-        int triagerpayout = int (payout/triagercount);
+        uint triagerpayout = (payout/triagercount);
         
 
         for (i=0; i<triagercount; i++){
-            MockToken_(TokenAddress).Transfer(address(this), triagers[i], (triagerpayout));
+            IERC20(MockStableCoin).transferFrom(address(this), triagers[i], (triagerpayout));
 
         }
 

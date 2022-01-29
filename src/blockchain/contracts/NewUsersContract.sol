@@ -1,6 +1,9 @@
 pragma solidity ^0.8.0;
 
+
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
+
 interface SubmittedSystems{
     function GetAuditWindow(string memory IPFS) external view returns(uint);
     function GetAuditor(string memory IPFS) external view returns(address);
@@ -9,7 +12,7 @@ interface SubmittedSystems{
 }
 
 
-contract NewUsersContract {
+contract NewUsersContract is Ownable {
 
 address DeployerAddress;
 constructor(address deployeraddress){
@@ -81,7 +84,7 @@ function ViewScore(address auditor) public view returns(int){
 
 }
 
-function SetAuditorScoreTESTING(address auditor)public{
+function SetAuditorScore(address auditor)public onlyOwner {
     Auditor storage Auditor_ = Auditors[auditor];
     Auditor_.Score=100;
 }

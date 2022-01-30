@@ -56,10 +56,14 @@ function UpdateAuditedContracts(address auditor, string memory IPFS) external {
 
 }
 
+int totalscore;
+int totalusers;
+
 
 function GetScore(address auditor) public returns (int){
     
     Auditor storage Auditor_ = Auditors[auditor];
+    int currentscore= Auditor_.Score;
     //tallies score every time it is requested (is this too expensive?)
     uint i;
     for (i=0;i<Auditor_.ContractCounter+1;i++){
@@ -75,7 +79,13 @@ function GetScore(address auditor) public returns (int){
             outcome = int(outcome);
             Auditor_.Score=Auditor_.Score - (outcome*10);
         }
-        else{}
+    }
+
+    if (currentscore != Auditor_.Score){
+        totalscore = totalscore +(currentscore-Auditor_.Score);
+    } 
+    if (Auditor_.ContractCounter==1 && Auditor_.Score >= 1){
+        totalusers++;
     }
     return Auditor_.Score;
 }

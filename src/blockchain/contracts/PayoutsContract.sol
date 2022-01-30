@@ -13,6 +13,7 @@ interface newsubmittedsystems{
     function AuditorPaid(string memory IPFS)external;
     function GetAuditorPaid(string memory IPFS)external view returns (bool);
     function GetOutcome(string memory IPFS) external view returns (uint);
+    function UpdateSystemsUnderAudit()external;
 }
 
 interface Triage{
@@ -60,6 +61,7 @@ InterfaceAddress=_InterfaceAddress;
    
     //updating system status
     newsubmittedsystems(SubmittedSystemsAddress).AuditorPaid(IPFS);
+    newsubmittedsystems(SubmittedSystemsAddress).UpdateSystemsUnderAudit();
    
     //actual transfer
     IERC20(MockStableCoin).transferFrom(address(this), auditor,  payout);
@@ -85,6 +87,7 @@ InterfaceAddress=_InterfaceAddress;
         }
 
     }
+
 
 }
 

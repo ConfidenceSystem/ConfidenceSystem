@@ -1,5 +1,4 @@
 //SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
@@ -45,7 +44,8 @@ struct SubmittedSystem{
 
     uint AuditWindowEnd;
     uint Payout;
-    bool AuditorPaid;
+    uint Bounty;
+    bool Paid;
     uint Outcome; //numbers correspond to outcome details (0=still under audit) (1=no vulns found) (2-6 = vulns found(higher = more severe))
     address Auditor;
     int MinScore;
@@ -66,6 +66,7 @@ struct SubmittedSystemHack {
 mapping (string => SubmittedSystem) public SubmittedSystems;
 mapping (string => SubmittedSystemHack) public SubmittedSystemHacks;
 
+uint systemsunderaudit;
 
 function SubmitSystem(string memory IPFS, int MinAuditorScore, uint Payout, address Submitter) public {
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
@@ -76,6 +77,7 @@ function SubmitSystem(string memory IPFS, int MinAuditorScore, uint Payout, addr
     SubmittedSystem_.SubmitterAddress=Submitter;
     SubmittedSystem_.Payout=Payout;
     SubmittedSystem_.MinScore=MinAuditorScore;
+    systemsunderaudit++;
 
 }
 
@@ -91,7 +93,7 @@ function SetAuditor(string memory IPFS, address auditor) external {
 
 function AuditorPaid(string memory IPFS)external{
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-    SubmittedSystem_.AuditorPaid=true;
+    SubmittedSystem_.Paid=true;
 }
 
 function SubmitHackHash(string memory IPFS, string memory HackHash, address HackSubmitter)external returns (uint){
@@ -118,13 +120,20 @@ function SubmitHackURI(string memory IPFS, string memory HackURI, address HackSu
 
 }   
 
-function SetOutcome(string memory IPFS, uint outcome) external{
+function SetOutcome(string memory IPFS, uint outcome) public{
+    require (msg.sender == (address(this))||msg.sender == TriageAddress);
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
+    require(block.timestamp<SubmittedSystem_.AuditWindowEnd);
+    require(outcome>SubmittedSystem_.Outcome);
     SubmittedSystem_.Outcome=outcome;
+}
 
+function UpdateSystemsUnderAudit()external{
+    systemsunderaudit--;
 }
 
 //Getters, all restricted to view.
+
 
 function GetOutcome(string memory IPFS) external view returns (uint){
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
@@ -133,7 +142,7 @@ function GetOutcome(string memory IPFS) external view returns (uint){
 
 function GetAuditorPaid(string memory IPFS)external view returns (bool){
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-    return SubmittedSystem_.AuditorPaid;
+    return SubmittedSystem_.Paid;
 }
 
 function GetPayout(string memory IPFS) external view returns (uint){

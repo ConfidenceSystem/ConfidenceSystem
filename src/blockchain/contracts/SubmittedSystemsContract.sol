@@ -66,6 +66,30 @@ struct SubmittedSystemHack {
 mapping (string => SubmittedSystem) public SubmittedSystems;
 mapping (string => SubmittedSystemHack) public SubmittedSystemHacks;
 
+function HackPayoutDetails(string memory IPFS) public view returns(uint, address[] memory , uint[] memory){
+    SubmittedSystemHack storage System_ = SubmittedSystemHacks[IPFS];
+    uint counter = System_.HackCounter;
+    uint i;
+    address local;
+    uint ID;
+    uint outcome;
+    address[] memory IDs;
+    uint[] memory outcomes;
+    
+    for(i=0; i<=counter; i++){
+      local= System_.HackCounterAddress[i];
+      ID=System_.HackCounterAddressID[i];
+      outcome=System_.HackOutcome[local][ID];  
+
+      if (outcome>0){
+          IDs[i]=local;
+          outcomes[i]=outcome;
+      }
+    }
+    return(counter, IDs, outcomes);
+
+}
+
 uint systemsunderaudit;
 
 function SubmitSystem(string memory IPFS, int MinAuditorScore, uint Payout, address Submitter) public {
@@ -149,6 +173,12 @@ function GetPayout(string memory IPFS) external view returns (uint){
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
     return SubmittedSystem_.Payout;
 }
+
+function GetBounty(string memory IPFS) external view returns (uint){
+    SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
+    return SubmittedSystem_.Bounty;
+}
+
 function GetAuditor(string memory IPFS) external view returns(address){
     SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
     return SubmittedSystem_.Auditor;

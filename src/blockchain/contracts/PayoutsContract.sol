@@ -14,6 +14,8 @@ interface newsubmittedsystems{
     function GetAuditorPaid(string memory IPFS)external view returns (bool);
     function GetOutcome(string memory IPFS) external view returns (uint);
     function UpdateSystemsUnderAudit()external;
+    function GetBounty(string memory IPFS) external view returns (uint);
+    function HackPayoutDetails(string memory IPFS) external view returns(uint, address[] memory , uint[] memory);
 }
 
 interface Triage{
@@ -67,10 +69,34 @@ InterfaceAddress=_InterfaceAddress;
     IERC20(MockStableCoin).transferFrom(address(this), auditor,  payout);
     }
 
-    function BountyPayout(string memory IPFS, address Hacker, uint Bounty)external{
+    function BountyPayout(string memory IPFS)external{
+    
+        require (newsubmittedsystems(SubmittedSystemsAddress).GetAuditorPaid(IPFS) != true);
+        newsubmittedsystems(SubmittedSystemsAddress).AuditorPaid(IPFS);
+        
+
+        uint counter;
+        address[] memory hackers;
+        uint[] memory outcomes;
+        uint severitytotal;
+        uint i;
+        uint bounty = newsubmittedsystems(SubmittedSystemsAddress).GetBounty(IPFS);
+
+       (counter, hackers, outcomes) = newsubmittedsystems(SubmittedSystemsAddress).HackPayoutDetails(IPFS);
+
+        for(i=0; i<=counter; i++){
+            severitytotal = severitytotal+outcomes[i];
+        }
+
+        for(i=0; i<=counter; i++){
+            uint payout =bounty*(outcomes[i]/severitytotal);
+            if (payout>0){
+            IERC20(MockStableCoin).transferFrom(address(this), hackers[i],  payout);
+
+            }
+        }
 
     }
-    //testing
 
     function TriagePayout(string memory _IPFS, uint256 _HackID) external{
         address[10] memory triagers;

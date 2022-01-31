@@ -8,20 +8,13 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FidesToken is Ownable, ERC20 {
-   
-    constructor() ERC20("FidesToken", "FID") {
-        
-    }
+    constructor() ERC20("FidesToken", "FID") {}
 
-    function mint(address receiver, uint amount) public onlyOwner  {
+    function mint(address receiver, uint256 amount) public onlyOwner {
         _mint(receiver, amount);
-
     }
 
-    function burn(address burner, uint amount) public onlyOwner {
+    function burn(address burner, uint256 amount) public onlyOwner {
         _burn(burner, amount);
     }
-
-
 }
-

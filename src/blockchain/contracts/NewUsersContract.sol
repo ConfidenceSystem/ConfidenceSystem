@@ -46,74 +46,29 @@ contract NewUsersContract is Ownable {
         InterfaceAddress = _InterfaceAddress;
     }
 
-    struct Auditor {
-        mapping(uint256 => string) AuditedContract;
-        uint256 ContractCounter;
-        int256 Score;
-    }
-
-    mapping(address => Auditor) public Auditors;
-
-    function UpdateAuditedContracts(address auditor, string memory IPFS)
-        external
-    {
-        Auditor storage Auditor_ = Auditors[auditor];
-        Auditor_.ContractCounter++;
-        Auditor_.AuditedContract[Auditor_.ContractCounter] = IPFS;
-    }
-
     int256 totalscore;
     int256 totalusers;
 
-    function GetScore(address auditor) public returns (int256) {
-        Auditor storage Auditor_ = Auditors[auditor];
-        int256 currentscore = Auditor_.Score;
-        //tallies score every time it is requested (is this too expensive?)
-        uint256 i;
-        for (i = 0; i < Auditor_.ContractCounter + 1; i++) {
-            int256 outcome = int256(
-                SubmittedSystems(SubmittedSystemsAddress).GetOutcome(
-                    Auditor_.AuditedContract[i]
-                )
-            );
-            // uint AuditWindow = SubmittedSystems(SubmittedSystemsAddress).GetAuditWindow(Auditor_.AuditedContract[i]);
-
-            if (
-                (outcome == 0 || outcome == 1) /*&&(block.timestamp > AuditWindow)*/
-            ) {
-                outcome = int256(outcome);
-                Auditor_.Score = Auditor_.Score + outcome;
-            } else if (
-                outcome > 1 /*&& block.timestamp > AuditWindow*/
-            ) {
-                outcome = int256(outcome);
-                Auditor_.Score = Auditor_.Score - (outcome * 10);
-            }
-        }
-
-        if (currentscore != Auditor_.Score) {
-            totalscore = totalscore + (currentscore - Auditor_.Score);
-        }
-        if (Auditor_.ContractCounter == 1 && Auditor_.Score >= 1) {
-            totalusers++;
-        }
-        return Auditor_.Score;
+    function UpdateHackerScore(address _Hacker, uint256 _Amount) public {
+        require(msg.sender==PayoutsAddress);
+        Hacker storage Hacker_ = Hackers[_Hacker];
+        Hacker_.Score = Hacker_.Score + _Amount;
     }
 
-    function ViewScore(address auditor) public view returns (int256) {
-        Auditor storage Auditor_ = Auditors[auditor];
-        return Auditor_.Score;
+    function ViewScore(address _Hacker) public view returns (uint256) {
+        Hacker storage Hacker_ = Hackers[_Hacker];
+        return Hacker_.Score;
     }
 
-    function SetAuditorScore(address auditor) public onlyOwner {
-        Auditor storage Auditor_ = Auditors[auditor];
-        Auditor_.Score = 100;
+    function SetHackerScore(address _Hacker) public onlyOwner {
+        Hacker storage Hacker_ = Hackers[_Hacker];
+        Hacker_.Score = 100;
     }
 
     struct Hacker {
         mapping(uint256 => string) IPFS;
         uint256 Counter;
-        int256 Score;
+        uint256 Score;
     }
 
     struct Triager {
@@ -123,6 +78,8 @@ contract NewUsersContract is Ownable {
     }
 
     mapping(address => Triager) public Triagers;
+    mapping(address => Hacker) public Hackers;
+
     mapping(uint256 => address) public TriagersList;
     uint256 TriageCounter;
 
@@ -130,7 +87,6 @@ contract NewUsersContract is Ownable {
         Triager storage Triager_ = Triagers[user];
 
         // Adding a triager
-        // if (GetScore(user) > 50 && selection == true && Triager_.IsTriager != true){
         if (
             ViewScore(user) > 50 &&
             selection == true &&

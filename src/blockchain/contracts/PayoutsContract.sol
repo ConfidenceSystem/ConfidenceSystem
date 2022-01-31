@@ -43,6 +43,11 @@ interface Triage {
         );
 }
 
+interface Users {
+    function UpdateHackerScore(address _Hacker, uint256 _Amount) external; 
+
+}
+
 contract PayoutsContract {
     address DeployerAddress;
 
@@ -74,33 +79,7 @@ contract PayoutsContract {
         InterfaceAddress = _InterfaceAddress;
     }
 
-    function AuditPayout(string memory IPFS) external {
-        //get details
-        // uint auditwindow=newsubmittedsystems(SubmittedSystemsAddress).GetAuditWindow(IPFS);
-        address auditor = newsubmittedsystems(SubmittedSystemsAddress)
-            .GetAuditor(IPFS);
-        uint256 payout = newsubmittedsystems(SubmittedSystemsAddress).GetPayout(
-            IPFS
-        );
-
-        //checking stuff
-        //require(block.timestamp > auditwindow);
-        require(
-            newsubmittedsystems(SubmittedSystemsAddress).GetAuditorPaid(IPFS) !=
-                true
-        );
-        require(
-            newsubmittedsystems(SubmittedSystemsAddress).GetOutcome(IPFS) == 1
-        );
-
-        //updating system status
-        newsubmittedsystems(SubmittedSystemsAddress).AuditorPaid(IPFS);
-        newsubmittedsystems(SubmittedSystemsAddress).UpdateSystemsUnderAudit();
-
-        //actual transfer
-        IERC20(MockStableCoin).transferFrom(address(this), auditor, payout);
-    }
-
+   
     function BountyPayout(string memory IPFS) external {
         require(
             newsubmittedsystems(SubmittedSystemsAddress).GetAuditorPaid(IPFS) !=
@@ -133,6 +112,7 @@ contract PayoutsContract {
                     hackers[i],
                     payout
                 );
+            Users(UsersAddress).UpdateHackerScore(hackers[i], outcomes[i]);
             }
         }
     }

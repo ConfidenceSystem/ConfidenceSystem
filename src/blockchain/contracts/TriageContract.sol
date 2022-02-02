@@ -7,8 +7,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface NewUsers {
     function GetAvailableTriager(uint256 _position) external returns (address);
+
     function GetTriageCounter() external returns (uint256);
-    function UpdateTriagerScores(address[] memory triagers, int score, uint len ) external;
+
+    function UpdateTriagerScores(
+        address[] memory triagers,
+        int256 score,
+        uint256 len
+    ) external;
 }
 
 interface Payouts {
@@ -60,7 +66,6 @@ contract TriageContract {
         uint256 Outcome;
         uint256 TriagePayout;
     }
-   
 
     mapping(string => TriageRequest) public TriageRequests;
 
@@ -72,11 +77,10 @@ contract TriageContract {
     ) public {
         //setting request details
         string memory ID;
-        if(dispute == true){
-        ID = string(abi.encode(_IPFS, _HackID, "D"));
-        }
-        else{
-        ID = string(abi.encode(_IPFS, _HackID));
+        if (dispute == true) {
+            ID = string(abi.encode(_IPFS, _HackID, "D"));
+        } else {
+            ID = string(abi.encode(_IPFS, _HackID));
         }
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
         TriageRequest_.IPFS = _IPFS;
@@ -84,7 +88,7 @@ contract TriageContract {
         TriageRequest_.TriagerCount = _TriagerCount;
         TriageRequest_.TriagePayout = 100; // we can change this later
         TriageRequest_.TriageWindowEnd = block.timestamp + 100; // starts triage window, will figure out equivalent of 3 days in unix time
-        TriageRequest_.Outcome = 0; 
+        TriageRequest_.Outcome = 0;
         GetTriagers(ID);
     }
 
@@ -101,34 +105,40 @@ contract TriageContract {
                         TriageCounter
                 ); // Getting random triagers
         }
-
     }
 
-    function Vote(string memory _IPFS, uint256 _HackID, uint vote, address triager) public {
-        require (msg.sender == triager);
+    function Vote(
+        string memory _IPFS,
+        uint256 _HackID,
+        uint256 vote,
+        address triager
+    ) public {
+        require(msg.sender == triager);
         string memory ID = string(abi.encode(_IPFS, _HackID));
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
-        TriageRequest_.Vote[triager]=vote;
+        TriageRequest_.Vote[triager] = vote;
     }
 
-    function GetVoteOutcome(string memory _IPFS, uint256 _HackID, bool dispute) public {
-
+    function GetVoteOutcome(
+        string memory _IPFS,
+        uint256 _HackID,
+        bool dispute
+    ) public {
         string memory ID;
-        if(dispute == true){
-        ID = string(abi.encode(_IPFS, _HackID, "D"));
-        }
-        else{
-        ID = string(abi.encode(_IPFS, _HackID));
+        if (dispute == true) {
+            ID = string(abi.encode(_IPFS, _HackID, "D"));
+        } else {
+            ID = string(abi.encode(_IPFS, _HackID));
         }
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
-        require(TriageRequest_.Outcome==0);
+        require(TriageRequest_.Outcome == 0);
         require(block.timestamp > TriageRequest_.TriageWindowEnd);
         uint256 i;
         uint256[] memory tally;
         address[] memory triagers;
         for (i = 0; i < TriageRequest_.TriagerCount; i++) {
             address triager = TriageRequest_.Triagers[i];
-            triagers[i]=triager;
+            triagers[i] = triager;
             tally[TriageRequest_.Vote[triager]]++; //get triagers vote, and tallies that position in array
             if (
                 tally[TriageRequest_.Vote[triager]] ==
@@ -139,24 +149,26 @@ contract TriageContract {
             }
         }
         if (TriageRequest_.Outcome == 0) {
-            MakeTriageRequest(_IPFS, _HackID, TriageRequest_.TriagerCount, false);
+            MakeTriageRequest(
+                _IPFS,
+                _HackID,
+                TriageRequest_.TriagerCount,
+                false
+            );
             //if consensus is not met, overwrites and gets new triagers
-        }
-        
-        else{
+        } else {
             SubmittedSystem(SubmittedSystemsAddress).SetOutcome(
                 _IPFS,
                 TriageRequest_.Outcome
             );
             Payouts(PayoutsAddress).TriagePayout(_IPFS, _HackID);
-            int256 score =1;
-            uint len = TriageRequest_.TriagerCount;
+            int256 score = 1;
+            uint256 len = TriageRequest_.TriagerCount;
             NewUsers(UsersAddress).UpdateTriagerScores(triagers, score, len);
         }
     }
 
-    function Dispute(string memory _IPFS, uint256 _HackID) internal{
-
+    function Dispute(string memory _IPFS, uint256 _HackID) internal {
         address[] memory triagers;
         string memory DisputeID = string(abi.encode(_IPFS, _HackID, "D"));
         string memory ID = string(abi.encode(_IPFS, _HackID));
@@ -164,16 +176,16 @@ contract TriageContract {
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
         TriageRequest storage TriageDispute_ = TriageRequests[DisputeID];
 
-        if (TriageRequest_.Outcome != TriageDispute_.Outcome){
-            uint i;
+        if (TriageRequest_.Outcome != TriageDispute_.Outcome) {
+            uint256 i;
             for (i = 0; i < TriageRequest_.TriagerCount; i++) {
-            triagers[i] = TriageRequest_.Triagers[i];
+                triagers[i] = TriageRequest_.Triagers[i];
             }
-          int score = -10;
-          uint len =TriageRequest_.TriagerCount;
+            int256 score = -10;
+            uint256 len = TriageRequest_.TriagerCount;
 
-        NewUsers(UsersAddress).UpdateTriagerScores(triagers, score, len);
-    }
+            NewUsers(UsersAddress).UpdateTriagerScores(triagers, score, len);
+        }
     }
 
     //getters, restricted to view

@@ -7,11 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface newsubmittedsystems {
     function GetAuditWindow(string memory IPFS) external view returns (uint256);
-
-    function GetAuditor(string memory IPFS) external view returns (address);
-
-    function GetPayout(string memory IPFS) external view returns (uint256);
-
+    
     function AuditorPaid(string memory IPFS) external;
 
     function GetAuditorPaid(string memory IPFS) external view returns (bool);

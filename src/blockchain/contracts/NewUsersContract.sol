@@ -5,16 +5,6 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
-interface SubmittedSystems {
-    function GetAuditWindow(string memory IPFS) external view returns (uint256);
-
-    function GetAuditor(string memory IPFS) external view returns (address);
-
-    function GetPayout(string memory IPFS) external view returns (uint256);
-
-    function GetOutcome(string memory IPFS) external view returns (uint256);
-}
-
 contract NewUsersContract is Ownable {
     address DeployerAddress;
 
@@ -45,9 +35,6 @@ contract NewUsersContract is Ownable {
         TriageAddress = _TriageAddress;
         InterfaceAddress = _InterfaceAddress;
     }
-
-    int256 totalscore;
-    int256 totalusers;
 
     function UpdateHackerScore(address _Hacker, uint256 _Amount) public {
         require(msg.sender==PayoutsAddress);
@@ -83,14 +70,29 @@ contract NewUsersContract is Ownable {
     mapping(uint256 => address) public TriagersList;
     uint256 TriageCounter;
 
-    function UpdateAvailableTriagers(address user, bool selection) external {
+
+    function UpdateTriagerScores(address[] memory triagers, int score, uint len ) external{
+        uint i;
+        for (i=0;i<len;i++){
+        Triager storage Triager_ = Triagers[triagers[i]];
+        Triager_.Score=Triager_.Score+score;
+        if (Triager_.Score<0){
+            UpdateAvailableTriagers(triagers[i], false);
+        }
+        }
+    }
+
+
+    function UpdateAvailableTriagers(address user, bool selection) public {
         Triager storage Triager_ = Triagers[user];
 
         // Adding a triager
         if (
             ViewScore(user) > 50 &&
             selection == true &&
-            Triager_.IsTriager != true
+            Triager_.IsTriager != true &&
+            Triager_.Score>=0
+        
         ) {
             Triager_.IsTriager = selection;
             TriageCounter++;

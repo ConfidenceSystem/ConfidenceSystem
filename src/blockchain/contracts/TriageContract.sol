@@ -65,30 +65,27 @@ contract TriageContract {
         mapping(address => uint256) Vote;
         uint256 Outcome;
         uint256 TriagePayout;
+        uint256 DisputeCounter;
     }
-
+    mapping(string => uint) public DisputeCounter;  
     mapping(string => TriageRequest) public TriageRequests;
 
     function MakeTriageRequest(
         string memory _IPFS,
         uint256 _HackID,
-        uint256 _TriagerCount,
-        bool dispute
+        uint256 _TriagerCount
     ) public {
         //setting request details
-        string memory ID;
-        if (dispute == true) {
-            ID = string(abi.encode(_IPFS, _HackID, "D"));
-        } else {
-            ID = string(abi.encode(_IPFS, _HackID));
-        }
+        string memory Dispute_ = string(abi.encode(_IPFS, _HackID));
+        uint DisputeCounterLocal=DisputeCounter[Dispute_];
+        string memory ID = string(abi.encode(_IPFS, _HackID, DisputeCounterLocal)); 
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
+        TriageRequest_ = TriageRequests[ID];
         TriageRequest_.IPFS = _IPFS;
         TriageRequest_.HackID = _HackID;
         TriageRequest_.TriagerCount = _TriagerCount;
         TriageRequest_.TriagePayout = 100; // we can change this later
         TriageRequest_.TriageWindowEnd = block.timestamp + 100; // starts triage window, will figure out equivalent of 3 days in unix time
-        TriageRequest_.Outcome = 0;
         GetTriagers(ID);
     }
 
@@ -121,15 +118,11 @@ contract TriageContract {
 
     function GetVoteOutcome(
         string memory _IPFS,
-        uint256 _HackID,
-        bool dispute
+        uint256 _HackID
     ) public {
-        string memory ID;
-        if (dispute == true) {
-            ID = string(abi.encode(_IPFS, _HackID, "D"));
-        } else {
-            ID = string(abi.encode(_IPFS, _HackID));
-        }
+        string memory Dispute_ = string(abi.encode(_IPFS, _HackID));
+        uint DisputeCounterLocal=DisputeCounter[Dispute_];
+        string memory ID = string(abi.encode(_IPFS, _HackID, DisputeCounterLocal)); 
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
         require(TriageRequest_.Outcome == 0);
         require(block.timestamp > TriageRequest_.TriageWindowEnd);
@@ -148,15 +141,17 @@ contract TriageContract {
                 TriageRequest_.Outcome = TriageRequest_.Vote[triager];
             }
         }
-        if (TriageRequest_.Outcome == 0) {
+        if (TriageRequest_.Outcome == 0) { //if consensus is not met, overwrites and gets new triagers
+
             MakeTriageRequest(
                 _IPFS,
                 _HackID,
-                TriageRequest_.TriagerCount,
-                false
+                TriageRequest_.TriagerCount
             );
-            //if consensus is not met, overwrites and gets new triagers
         } else {
+            if(DisputeCounterLocal>0){
+                Dispute(_IPFS, _HackID);
+            }
             SubmittedSystem(SubmittedSystemsAddress).SetOutcome(
                 _IPFS,
                 TriageRequest_.Outcome
@@ -170,11 +165,17 @@ contract TriageContract {
 
     function Dispute(string memory _IPFS, uint256 _HackID) internal {
         address[] memory triagers;
-        string memory DisputeID = string(abi.encode(_IPFS, _HackID, "D"));
-        string memory ID = string(abi.encode(_IPFS, _HackID));
 
+        string memory Dispute_ = string(abi.encode(_IPFS, _HackID));
+        uint DisputeCounterLocal=DisputeCounter[Dispute_];
+       
+        string memory ID = string(abi.encode(_IPFS, _HackID, DisputeCounterLocal)); 
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
-        TriageRequest storage TriageDispute_ = TriageRequests[DisputeID];
+       
+        string memory PriorID = string(abi.encode(_IPFS, _HackID, DisputeCounterLocal-1)); 
+        TriageRequest storage TriageDispute_ = TriageRequests[PriorID];
+
+
 
         if (TriageRequest_.Outcome != TriageDispute_.Outcome) {
             uint256 i;
@@ -186,6 +187,7 @@ contract TriageContract {
 
             NewUsers(UsersAddress).UpdateTriagerScores(triagers, score, len);
         }
+        DisputeCounter[Dispute_]++;
     }
 
     //getters, restricted to view

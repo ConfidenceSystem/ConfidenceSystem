@@ -23,6 +23,14 @@ interface Payouts {
 
 interface SubmittedSystem {
     function SetOutcome(string memory _IPFS, uint256 outcome) external;
+
+    function UpdateShares(string memory IPFS, uint256 shares) external;
+
+    function UpdateHackOutcome(
+        uint256 _HackID,
+        string memory IPFS,
+        uint256 outcome
+    ) external;
 }
 
 contract TriageContract {
@@ -67,7 +75,7 @@ contract TriageContract {
         uint256 TriagePayout;
         uint256 DisputeCounter;
     }
-    mapping(string => uint) public DisputeCounter;  
+    mapping(string => uint256) public DisputeCounter;
     mapping(string => TriageRequest) public TriageRequests;
 
     function MakeTriageRequest(
@@ -77,12 +85,15 @@ contract TriageContract {
     ) public {
         //setting request details
         string memory Dispute_ = string(abi.encode(_IPFS, _HackID));
-        uint DisputeCounterLocal=DisputeCounter[Dispute_];
-        string memory ID = string(abi.encode(_IPFS, _HackID, DisputeCounterLocal)); 
+        uint256 DisputeCounterLocal = DisputeCounter[Dispute_];
+        string memory ID = string(
+            abi.encode(_IPFS, _HackID, DisputeCounterLocal)
+        );
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
         TriageRequest_ = TriageRequests[ID];
         TriageRequest_.IPFS = _IPFS;
         TriageRequest_.HackID = _HackID;
+        TriageRequest_.Outcome=9;
         TriageRequest_.TriagerCount = _TriagerCount;
         TriageRequest_.TriagePayout = 100; // we can change this later
         TriageRequest_.TriageWindowEnd = block.timestamp + 100; // starts triage window, will figure out equivalent of 3 days in unix time
@@ -116,15 +127,14 @@ contract TriageContract {
         TriageRequest_.Vote[triager] = vote;
     }
 
-    function GetVoteOutcome(
-        string memory _IPFS,
-        uint256 _HackID
-    ) public {
+    function GetVoteOutcome(string memory _IPFS, uint256 _HackID) public {
         string memory Dispute_ = string(abi.encode(_IPFS, _HackID));
-        uint DisputeCounterLocal=DisputeCounter[Dispute_];
-        string memory ID = string(abi.encode(_IPFS, _HackID, DisputeCounterLocal)); 
+        uint256 DisputeCounterLocal = DisputeCounter[Dispute_];
+        string memory ID = string(
+            abi.encode(_IPFS, _HackID, DisputeCounterLocal)
+        );
         TriageRequest storage TriageRequest_ = TriageRequests[ID];
-        require(TriageRequest_.Outcome == 0);
+        require(TriageRequest_.Outcome == 9);
         require(block.timestamp > TriageRequest_.TriageWindowEnd);
         uint256 i;
         uint256[] memory tally;
@@ -141,18 +151,20 @@ contract TriageContract {
                 TriageRequest_.Outcome = TriageRequest_.Vote[triager];
             }
         }
-        if (TriageRequest_.Outcome == 0) { //if consensus is not met, overwrites and gets new triagers
+        if (TriageRequest_.Outcome == 9) {
+            //if consensus is not met, overwrites and gets new triagers
 
-            MakeTriageRequest(
-                _IPFS,
-                _HackID,
-                TriageRequest_.TriagerCount
-            );
+            MakeTriageRequest(_IPFS, _HackID, TriageRequest_.TriagerCount);
         } else {
-            if(DisputeCounterLocal>0){
+            if (DisputeCounterLocal > 0) {
                 Dispute(_IPFS, _HackID);
             }
-            SubmittedSystem(SubmittedSystemsAddress).SetOutcome(
+            SubmittedSystem(SubmittedSystemsAddress).UpdateShares(
+                _IPFS,
+                TriageRequest_.Outcome
+            );
+            SubmittedSystem(SubmittedSystemsAddress).UpdateHackOutcome(
+                _HackID,
                 _IPFS,
                 TriageRequest_.Outcome
             );
@@ -167,15 +179,17 @@ contract TriageContract {
         address[] memory triagers;
 
         string memory Dispute_ = string(abi.encode(_IPFS, _HackID));
-        uint DisputeCounterLocal=DisputeCounter[Dispute_];
-       
-        string memory ID = string(abi.encode(_IPFS, _HackID, DisputeCounterLocal)); 
-        TriageRequest storage TriageRequest_ = TriageRequests[ID];
-       
-        string memory PriorID = string(abi.encode(_IPFS, _HackID, DisputeCounterLocal-1)); 
-        TriageRequest storage TriageDispute_ = TriageRequests[PriorID];
+        uint256 DisputeCounterLocal = DisputeCounter[Dispute_];
 
+        string memory ID = string(
+            abi.encode(_IPFS, _HackID, DisputeCounterLocal)
+        );
+        TriageRequest storage TriageDispute_ = TriageRequests[ID];
 
+        string memory PriorID = string(
+            abi.encode(_IPFS, _HackID, DisputeCounterLocal - 1)
+        );
+        TriageRequest storage TriageRequest_ = TriageRequests[PriorID];
 
         if (TriageRequest_.Outcome != TriageDispute_.Outcome) {
             uint256 i;

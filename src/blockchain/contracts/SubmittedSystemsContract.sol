@@ -53,13 +53,9 @@ contract SubmittedSystemsContract {
 
     struct SubmittedSystem {
         uint256 AuditWindowEnd;
-        uint256 Payout;
         uint256 Bounty;
         bool Paid;
-        uint256 Outcome; //numbers correspond to outcome details (0=still under audit) (1=no vulns found) (2-6 = vulns found(higher = more severe))
-        address Auditor;
-        int256 MinScore;
-        bool SetDetails;
+        uint256 TotalShares;
         address SubmitterAddress;
     }
 
@@ -111,34 +107,20 @@ contract SubmittedSystemsContract {
 
     function SubmitSystem(
         string memory IPFS,
-        int256 MinAuditorScore,
         uint256 Payout,
         address Submitter
     ) public {
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-        require(SubmittedSystem_.SetDetails != true);
-        SubmittedSystem_.SetDetails = true;
-        SubmittedSystem_.Outcome = 1;
+        require(SubmittedSystem_.Bounty == 0);
         IERC20(MockStableCoin).transferFrom(Submitter, PayoutsAddress, Payout); // puts money in escrow
         SubmittedSystem_.SubmitterAddress = Submitter;
-        SubmittedSystem_.Payout = Payout;
-        SubmittedSystem_.MinScore = MinAuditorScore;
         systemsunderaudit++;
     }
 
-    function SetAuditor(string memory IPFS, address auditor) external {
+    function StartTimeWindow(string memory IPFS, uint256 length) public {
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-
-        require(
-            SubmittedSystem_.Auditor ==
-                0x0000000000000000000000000000000000000000
-        );
-        require(
-            Users(UsersAddress).GetScore(auditor) >= SubmittedSystem_.MinScore
-        );
-        Users(UsersAddress).UpdateAuditedContracts(auditor, IPFS);
-        SubmittedSystem_.Auditor = auditor;
-        SubmittedSystem_.AuditWindowEnd = block.timestamp + 100; //figure out how long 2 weeks is in eth time
+        require(msg.sender == SubmittedSystem_.SubmitterAddress);
+        SubmittedSystem_.AuditWindowEnd = block.timestamp + length;
     }
 
     function AuditorPaid(string memory IPFS) external {
@@ -187,43 +169,39 @@ contract SubmittedSystemsContract {
         Triage(TriageAddress).MakeTriageRequest(IPFS, HackID, 4); //making triage request
     }
 
-    function SetOutcome(string memory IPFS, uint256 outcome) public {
+    /*   function SetOutcome(string memory IPFS, uint256 outcome) public {
         require(msg.sender == (address(this)) || msg.sender == TriageAddress);
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
         require(block.timestamp < SubmittedSystem_.AuditWindowEnd);
-        require(outcome > SubmittedSystem_.Outcome);
         SubmittedSystem_.Outcome = outcome;
-    }
+    }*/
 
     function UpdateSystemsUnderAudit() external {
         systemsunderaudit--;
     }
 
-    //Getters, all restricted to view.
-
-    function GetOutcome(string memory IPFS) external view returns (uint256) {
+    function UpdateShares(string memory IPFS, uint256 shares) public {
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-        return SubmittedSystem_.Outcome;
+        SubmittedSystem_.TotalShares = SubmittedSystem_.TotalShares + shares;
     }
+
+    function UpdateHackOutcome(uint256 _HackID, string memory IPFS, uint outcome) public {
+        SubmittedSystemHack storage System_ = SubmittedSystemHacks[IPFS];
+        address local = System_.HackCounterAddress[_HackID];
+        uint256 ID = System_.HackCounterAddressID[_HackID];
+        System_.HackOutcome[local][ID]=outcome;
+    }
+
+    //Getters, all restricted to view.
 
     function GetAuditorPaid(string memory IPFS) external view returns (bool) {
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
         return SubmittedSystem_.Paid;
     }
 
-    function GetPayout(string memory IPFS) external view returns (uint256) {
-        SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-        return SubmittedSystem_.Payout;
-    }
-
     function GetBounty(string memory IPFS) external view returns (uint256) {
         SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
         return SubmittedSystem_.Bounty;
-    }
-
-    function GetAuditor(string memory IPFS) external view returns (address) {
-        SubmittedSystem storage SubmittedSystem_ = SubmittedSystems[IPFS];
-        return SubmittedSystem_.Auditor;
     }
 
     function GetAuditWindow(string memory IPFS)

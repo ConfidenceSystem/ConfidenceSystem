@@ -7,11 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface newsubmittedsystems {
     function GetAuditWindow(string memory IPFS) external view returns (uint256);
-
-    function GetAuditor(string memory IPFS) external view returns (address);
-
-    function GetPayout(string memory IPFS) external view returns (uint256);
-
+    
     function AuditorPaid(string memory IPFS) external;
 
     function GetAuditorPaid(string memory IPFS) external view returns (bool);
@@ -41,6 +37,11 @@ interface Triage {
             uint256,
             uint256
         );
+}
+
+interface Users {
+    function UpdateHackerScore(address _Hacker, uint256 _Amount) external; 
+
 }
 
 contract PayoutsContract {
@@ -74,33 +75,7 @@ contract PayoutsContract {
         InterfaceAddress = _InterfaceAddress;
     }
 
-    function AuditPayout(string memory IPFS) external {
-        //get details
-        // uint auditwindow=newsubmittedsystems(SubmittedSystemsAddress).GetAuditWindow(IPFS);
-        address auditor = newsubmittedsystems(SubmittedSystemsAddress)
-            .GetAuditor(IPFS);
-        uint256 payout = newsubmittedsystems(SubmittedSystemsAddress).GetPayout(
-            IPFS
-        );
-
-        //checking stuff
-        //require(block.timestamp > auditwindow);
-        require(
-            newsubmittedsystems(SubmittedSystemsAddress).GetAuditorPaid(IPFS) !=
-                true
-        );
-        require(
-            newsubmittedsystems(SubmittedSystemsAddress).GetOutcome(IPFS) == 1
-        );
-
-        //updating system status
-        newsubmittedsystems(SubmittedSystemsAddress).AuditorPaid(IPFS);
-        newsubmittedsystems(SubmittedSystemsAddress).UpdateSystemsUnderAudit();
-
-        //actual transfer
-        IERC20(MockStableCoin).transferFrom(address(this), auditor, payout);
-    }
-
+   
     function BountyPayout(string memory IPFS) external {
         require(
             newsubmittedsystems(SubmittedSystemsAddress).GetAuditorPaid(IPFS) !=
@@ -133,6 +108,7 @@ contract PayoutsContract {
                     hackers[i],
                     payout
                 );
+            Users(UsersAddress).UpdateHackerScore(hackers[i], outcomes[i]);
             }
         }
     }
